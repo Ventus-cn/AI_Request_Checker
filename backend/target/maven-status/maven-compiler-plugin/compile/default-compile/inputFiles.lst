@@ -1,0 +1,9 @@
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\AmbiguityApplication.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\config\CorsConfig.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\controller\ReviewController.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\dto\ReviewDtos.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\model\Review.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\repository\ReviewRepository.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\service\AiReviewService.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\service\DocumentService.java
+D:\deepseek harness workspace\AI_Request_check\backend\src\main\java\com\example\ambiguity\service\ReviewService.java

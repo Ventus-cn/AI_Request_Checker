@@ -1,0 +1,21 @@
+server:
+  port: ${PORT:8080}
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/ambiguity;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+app:
+  ai-mode: ${AI_MODE:mock}
+  qwen-api-key: ${DASHSCOPE_API_KEY:}
+  qwen-model: ${QWEN_MODEL:qwen-plus}
+  qwen-url: ${QWEN_URL:https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions}

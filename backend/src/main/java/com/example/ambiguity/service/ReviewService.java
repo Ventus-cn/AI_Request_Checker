@@ -8,16 +8,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class ReviewService {
+  private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
   private final ReviewRepository repo; private final AiReviewService ai; private final ObjectMapper mapper = new ObjectMapper();
   public ReviewService(ReviewRepository repo, AiReviewService ai){this.repo=repo;this.ai=ai;}
-  public ReviewResponse create(ReviewRequest req){ String mode=req.mode()==null?"全面审查":req.mode(); Map<String,Object> report=ai.review(req.text(),mode); return save(req.text(),mode,report); }
-  private ReviewResponse save(String text,String mode,Map<String,Object> report){ try {Review r=new Review(text,mode,mapper.writeValueAsString(report)); return response(repo.save(r));} catch(Exception e){throw new IllegalStateException("保存审查记录失败");} }
-  public ReviewResponse follow(UUID id,String q){ Review r=repo.findById(id).orElseThrow(()->new NoSuchElementException("审查记录不存在")); Map<String,Object> report=ai.review(r.getText()+"\n\n用户追问："+q,r.getMode()); try {List<Map<String,Object>> versions=mapper.readValue(r.getVersionsJson(),new TypeReference<>(){}); versions.add(mapper.readValue(r.getReportJson(),new TypeReference<>(){})); r.setVersionsJson(mapper.writeValueAsString(versions)); r.setReportJson(mapper.writeValueAsString(report)); return response(repo.save(r));}catch(Exception e){throw new IllegalStateException("保存追问版本失败");}}
+  private static final Set<String> MODES = Set.of("全面审查", "可测试性", "安全与权限");
+  public ReviewResponse create(ReviewRequest req){
+    if (req == null || req.text() == null || req.text().isBlank()) throw new IllegalArgumentException("需求文本不能为空");
+    if (req.text().length() > 20000) throw new IllegalArgumentException("需求文本不能超过 20000 个字符");
+    String mode=req.mode()==null||req.mode().isBlank()?"全面审查":req.mode();
+    if (!MODES.contains(mode)) throw new IllegalArgumentException("不支持的审查模式");
+    log.info("review.create mode={} chars={}", mode, req.text().length());
+    Map<String,Object> report=ai.review(req.text(),mode); return save(req.text(),mode,report);
+  }
+  private ReviewResponse save(String text,String mode,Map<String,Object> report){ try {Review r=new Review(text,mode,mapper.writeValueAsString(report)); Review saved=repo.save(r); log.info("review.saved id={}", saved.getId()); return response(saved);} catch(Exception e){log.error("review.save_failed",e); throw new IllegalStateException("保存审查记录失败");} }
+  public ReviewResponse follow(UUID id,String q){
+    if (q == null || q.isBlank()) throw new IllegalArgumentException("追问内容不能为空");
+    if (q.length() > 2000) throw new IllegalArgumentException("追问不能超过 2000 个字符");
+    Review r=repo.findById(id).orElseThrow(()->new NoSuchElementException("审查记录不存在"));
+    Map<String,Object> report=ai.review(r.getText()+"\n\n用户追问："+q,r.getMode());
+    try {List<Map<String,Object>> versions=mapper.readValue(r.getVersionsJson(),new TypeReference<>(){}); versions.add(mapper.readValue(r.getReportJson(),new TypeReference<>(){})); r.setVersionsJson(mapper.writeValueAsString(versions)); r.setReportJson(mapper.writeValueAsString(report)); Review saved=repo.save(r); log.info("review.follow_up id={} versions={}", id, versions.size()); return response(saved);}catch(Exception e){log.error("review.follow_up_failed id={}",id,e); throw new IllegalStateException("保存追问版本失败");}}
   public List<HistoryItem> history(){ return repo.findAll().stream().sorted(Comparator.comparing(Review::getCreatedAt).reversed()).map(r->{try{Map<String,Object> p=mapper.readValue(r.getReportJson(),new TypeReference<>(){});return new HistoryItem(r.getId().toString(),r.getCreatedAt().toString(),r.getText().replaceAll("\\s+"," ").substring(0,Math.min(90,r.getText().replaceAll("\\s+"," ").length())),String.valueOf(p.getOrDefault("riskLevel","low")),(Map<String,Object>)p.getOrDefault("counts",Map.of()));}catch(Exception e){return new HistoryItem(r.getId().toString(),r.getCreatedAt().toString(),r.getText(),"unknown",Map.of());}}).collect(Collectors.toList()); }
   public ReviewResponse get(UUID id){return response(repo.findById(id).orElseThrow(()->new NoSuchElementException("审查记录不存在")));}
-  public void delete(UUID id){repo.deleteById(id);}
+  public void delete(UUID id){ if (!repo.existsById(id)) throw new NoSuchElementException("审查记录不存在"); repo.deleteById(id); log.info("review.deleted id={}",id); }
   private ReviewResponse response(Review r){try{return new ReviewResponse(r.getId().toString(),r.getText(),r.getMode(),r.getCreatedAt().toString(),mapper.readValue(r.getReportJson(),new TypeReference<>(){}),mapper.readValue(r.getVersionsJson(),new TypeReference<>(){}));}catch(Exception e){throw new IllegalStateException("审查报告解析失败");}}
 }

@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class DocumentService {
   public String extract(MultipartFile file) throws IOException {
     String name = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase();
+    if (file.isEmpty()) throw new IllegalArgumentException("上传文件不能为空");
     if (name.endsWith(".docx")) {
       try (XWPFDocument doc = new XWPFDocument(file.getInputStream())) {
         return doc.getParagraphs().stream().map(XWPFParagraph::getText).filter(s -> !s.isBlank()).collect(Collectors.joining("\n"));

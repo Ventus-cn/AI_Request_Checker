@@ -1,4 +1,16 @@
 $ErrorActionPreference = 'Stop'
+# Load local secrets without committing them. Create backend/.env.local with
+# AI_MODE=qwen, DASHSCOPE_API_KEY=..., QWEN_MODEL=qwen-plus, and optionally QWEN_URL/PORT.
+$localEnv = Join-Path $PSScriptRoot '.env.local'
+if (Test-Path -LiteralPath $localEnv) {
+  Get-Content -LiteralPath $localEnv | ForEach-Object {
+    $line = $_.Trim()
+    if ($line -and -not $line.StartsWith('#') -and $line.Contains('=')) {
+      $pair = $line.Split('=',2)
+      [Environment]::SetEnvironmentVariable($pair[0].Trim(), $pair[1].Trim())
+    }
+  }
+}
 $mvn = Get-Command mvn -ErrorAction SilentlyContinue
 if ($mvn) { & $mvn.Source spring-boot:run; exit $LASTEXITCODE }
 $candidates = @(

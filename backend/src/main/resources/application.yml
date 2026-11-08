@@ -19,3 +19,18 @@ app:
   qwen-api-key: ${DASHSCOPE_API_KEY:}
   qwen-model: ${QWEN_MODEL:qwen-plus}
   qwen-url: ${QWEN_URL:https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions}
+  vision-enabled: ${VISION_ENABLED:true}
+  qwen-vision-model: ${QWEN_VISION_MODEL:qwen-vl-max}
+  qwen-vision-url: ${QWEN_VISION_URL:${app.qwen-url}}
+  vision-max-units: ${VISION_MAX_UNITS:30}
+  pdf-font-path: ${PDF_FONT_PATH:}
+  agent:
+    enabled: ${AGENT_ENABLED:true}
+    max-steps: ${AGENT_MAX_STEPS:6}
+    max-tool-calls-per-step: ${AGENT_MAX_TOOL_CALLS_PER_STEP:3}
+    model-timeout-ms: ${AGENT_MODEL_TIMEOUT_MS:30000}
+    tool-timeout-ms: ${AGENT_TOOL_TIMEOUT_MS:5000}
+    total-timeout-ms: ${AGENT_TOTAL_TIMEOUT_MS:60000}
+    max-answer-retries: ${AGENT_MAX_ANSWER_RETRIES:2}
+    confirm-ttl-ms: ${AGENT_CONFIRM_TTL_MS:300000}
+    log-dir: ${AGENT_LOG_DIR:./logs/agent-runs}

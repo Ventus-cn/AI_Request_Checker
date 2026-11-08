@@ -1,0 +1,109 @@
+{
+  "chunk_count": 66,
+  "sources": [
+    "README.md",
+    "需求文档\\软件设计说明书.md",
+    "需求文档\\需求规格书.md"
+  ],
+  "questions": [
+    {
+      "question": "系统支持哪些输入方式和文件限制？",
+      "top_k": [],
+      "context": "",
+      "elapsed_ms": 2.26,
+      "answer_rule": "仅依据检索片段作答；无支持片段时返回“资料不足，需人工确认”。"
+    },
+    {
+      "question": "AI 服务失败时如何处理，是否保存无效报告？",
+      "top_k": [
+        {
+          "score": 5,
+          "id": "S010",
+          "source": "软件设计说明书.md",
+          "heading": "2.2 核心业务闭环"
+        },
+        {
+          "score": 5,
+          "id": "S014",
+          "source": "软件设计说明书.md",
+          "heading": "3.2 视觉方向"
+        },
+        {
+          "score": 5,
+          "id": "S028",
+          "source": "软件设计说明书.md",
+          "heading": "当前版本与参考项目的功能边界"
+        }
+      ],
+      "context": "[S010] 软件设计说明书.md / 2.2 核心业务闭环\nache POI 解析 DOCX，PDFBox 解析文字型 PDF | 扫描 PDF 显示无法提取文字，不生成空报告 |\n\n---\n\n## 2. 总体架构设计\n\n### 2.1 分层结构\n\n```mermaid\nflowchart LR\n    U[产品经理 / 开发 / 测试] --> FE[Vue 3 单页工作台]\n    FE --> API[REST API /api/reviews]\n    API --> C[ReviewController]\n    C --> S[ReviewService]\n    C --> D[DocumentService]\n    S --> AI[AiReviewService]\n    AI --> M[Mock 规则]\n    AI --> Q[Qwen 兼容接口]\n    S --> R[ReviewRepository]\n    R --> H2[(H2 文件数据库)]\n```\n\n### 2.2 核心业务闭环\n\n[S014] 软件设计说明书.md / 3.2 视觉方向\n建议修复放入可继续下钻的工作区，适合参考本项目的结果页信息层级。\n\n本项目采用这条主线的交互逻辑，但按当前实现收敛范围：\n\n| SpecLens AI 的模式 | 本项目的对应设计 | 当前实现边界 |\n|---|---|---|\n| 上传工作区 | 新建审查页的原文输入 + Word/PDF 导入卡片 | 当前支持单文件和单段文本，不承诺多文档项目 |\n| 解析/提取 | 上传后回填可编辑文本，用户确认后开始审查 | `POST /api/reviews/upload` 只解析，不自动调用 AI |\n| 健康度摘要 | 报告页的风险等级、风险计数和审查结论 | 当前使用 high/medium/low 计数，不引入未经实现的 0–100 健康分 |\n| Findings / Requirements Explorer | 问题类型筛选 + 证据卡片 | 当前以列表筛选为主，不实现冲突图和跨文档关系图 |\n| Finding detail | 问题卡片内展开原文、缺失条件、问题和验收标准 | 已由 `Issue` 字段支持 |\n| PDF 报告导出 | 设计为后续迭代入口 | 当前不在实现范围内 |\n\n[S028] 软件设计说明书.md / 当前版本与参考项目的功能边界\nfollow-up` |\n| 修改后重审 | 返回上传工作区，使用当前原文创建新档案 | `editAgain()` |\n\n### 证据卡片与发现项详情\n\n借鉴 SpecLens AI 的 Finding Detail 结构，卡片按以下顺序呈现：\n\n1. **识别：** 问题 ID、问题类型、风险胶囊；\n2. **判断：** 一句话解释，避免用户先读长段模型输出；\n3. **证据：** 原文引用、位置和衬线字体排版；\n4. **行动：** 缺失条件、待确认问题、验收标准；\n5. **影响：** 相关角色和返工风险。\n\n高风险问题只加强标签、数字和左侧边线，不给整张卡片铺红色。问题没有引用时显示“全文/未标注位置”等真实状态，不伪造行号。\n\n### 当前版本与参考项目的功能边界\n\nSpecLens AI 的冲突图、需求分类浏览、重复需求检测和 PDF 报告导出可作为后续设计方向，但当前报告页不应预留空图表或虚假统计。只有当后端提供对应数据和接口时，才加入：",
+      "elapsed_ms": 1.24,
+      "answer_rule": "仅依据检索片段作答；无支持片段时返回“资料不足，需人工确认”。"
+    },
+    {
+      "question": "追问后旧版本如何保存？",
+      "top_k": [],
+      "context": "",
+      "elapsed_ms": 1.15,
+      "answer_rule": "仅依据检索片段作答；无支持片段时返回“资料不足，需人工确认”。"
+    },
+    {
+      "question": "系统如何保护 API Key 和需求原文？",
+      "top_k": [
+        {
+          "score": 8,
+          "id": "S003",
+          "source": "README.md",
+          "heading": "使用流程"
+        },
+        {
+          "score": 8,
+          "id": "S058",
+          "source": "需求规格书.md",
+          "heading": "7.3 安全性与隐私"
+        },
+        {
+          "score": 6,
+          "id": "S009",
+          "source": "软件设计说明书.md",
+          "heading": "1.3 现有实现基线"
+        }
+      ],
+      "context": "[S003] README.md / 使用流程\nE_API_BASE_URL=http://localhost:8080/api`。\n\n## 千问配置与 Mock 模式\n\n复制 `backend/.env.example` 中的配置到运行环境，或在启动前设置环境变量：\n\n```powershell\n$env:AI_MODE=\"mock\"\n$env:DASHSCOPE_API_KEY=\"\"\n```\n\n默认即为 Mock 模式，不需要 API Key，适合演示完整流程。接入千问时：\n\n```powershell\n$env:AI_MODE=\"qwen\"\n$env:DASHSCOPE_API_KEY=\"你的千问APIKey\"\n$env:QWEN_MODEL=\"qwen-plus\"\n```\n\nAPI Key 只在后端使用，不会传给浏览器。千问返回内容要求为固定 JSON，后端会清理 markdown 代码围栏、校验字段并在异常时返回可理解错误。\n\n## 使用流程\n\n[S058] 需求规格书.md / 7.3 安全性与隐私\nDELETE | `/api/reviews/{id}` | UUID | 204 | 404不存在、500删除失败 |\n\n接口错误响应至少包含：\n\n```json\n{\"error\":\"面向用户的错误说明\",\"code\":\"可选错误码\"}\n```\n\n错误信息不得包含 API Key、完整堆栈、数据库连接字符串或本机绝对路径。\n\n## 7. 非功能需求\n\n### 7.1 可用性\n\n- 在 README 指定命令启动后，前端和后端能够正常访问；\n- Mock 模式下，常规文本审查响应时间目标不超过 10 秒；\n- 操作过程必须显示加载状态；\n- 页面在桌面宽度和窄屏下都可完成核心操作。\n\n### 7.2 可靠性\n\n- 单次请求失败不能导致后端进程退出；\n- 数据库读取失败、AI 调用失败、文件解析失败均有日志和用户反馈；\n- 重复点击开始审查不会在一次页面操作中发送重复请求；\n- 保存报告失败时不产生半条历史记录。\n\n### 7.3 安全性与隐私\n\n[S009] 软件设计说明书.md / 1.3 现有实现基线\nREST 接口、报告字段、后端服务的对应关系；\n- 可访问性、隐私、安全和可维护性要求。\n\n### 1.3 现有实现基线\n\n| 层次 | 当前实现 | 设计约束 |\n|---|---|---|\n| 前端 | Vue 3 + TypeScript + Vite + Element Plus + lucide-vue-next | 保持组件轻量，优先复用现有 Element Plus 表单能力 |\n| 页面状态 | `App.vue` 中的 `review`、`result`、`history` 三种视图状态 | 逻辑页面保持清晰，可在后续迭代替换为路由 |\n| 后端 | Spring Boot 3 + Java 17 + REST Controller/Service/Repository | 业务校验和 AI 输出校验放在后端，浏览器不接触 API Key |\n| 数据 | H2 文件数据库，保存原文、模式、当前报告和 `versions` | 历史档案按创建时间倒序展示 |\n| AI | Mock 默认可运行，可选 Qwen 兼容接口 | Mock 模式必须能完成完整演示闭环 |\n| 文档解析 | Apache POI 解析 DOCX，PDFBox 解析文字型 PDF | 扫描 PDF 显示无法提取文字，不生成空报告 |",
+      "elapsed_ms": 1.29,
+      "answer_rule": "仅依据检索片段作答；无支持片段时返回“资料不足，需人工确认”。"
+    },
+    {
+      "question": "是否实现了向量数据库和真正的 RAG？",
+      "top_k": [],
+      "context": "",
+      "elapsed_ms": 1.23,
+      "answer_rule": "仅依据检索片段作答；无支持片段时返回“资料不足，需人工确认”。"
+    },
+    {
+      "question": "扫描 PDF 能否直接生成报告？",
+      "top_k": [
+        {
+          "score": 8,
+          "id": "S009",
+          "source": "软件设计说明书.md",
+          "heading": "1.3 现有实现基线"
+        },
+        {
+          "score": 8,
+          "id": "S010",
+          "source": "软件设计说明书.md",
+          "heading": "2.2 核心业务闭环"
+        },
+        {
+          "score": 8,
+          "id": "S034",
+          "source": "软件设计说明书.md",
+          "heading": "7. 交互状态与异常设计"
+        }
+      ],
+      "context": "[S009] 软件设计说明书.md / 1.3 现有实现基线\nREST 接口、报告字段、后端服务的对应关系；\n- 可访问性、隐私、安全和可维护性要求。\n\n### 1.3 现有实现基线\n\n| 层次 | 当前实现 | 设计约束 |\n|---|---|---|\n| 前端 | Vue 3 + TypeScript + Vite + Element Plus + lucide-vue-next | 保持组件轻量，优先复用现有 Element Plus 表单能力 |\n| 页面状态 | `App.vue` 中的 `review`、`result`、`history` 三种视图状态 | 逻辑页面保持清晰，可在后续迭代替换为路由 |\n| 后端 | Spring Boot 3 + Java 17 + REST Controller/Service/Repository | 业务校验和 AI 输出校验放在后端，浏览器不接触 API Key |\n| 数据 | H2 文件数据库，保存原文、模式、当前报告和 `versions` | 历史档案按创建时间倒序展示 |\n| AI | Mock 默认可运行，可选 Qwen 兼容接口 | Mock 模式必须能完成完整演示闭环 |\n| 文档解析 | Apache POI 解析 DOCX，PDFBox 解析文字型 PDF | 扫描 PDF 显示无法提取文字，不生成空报告 |\n\n[S010] 软件设计说明书.md / 2.2 核心业务闭环\nache POI 解析 DOCX，PDFBox 解析文字型 PDF | 扫描 PDF 显示无法提取文字，不生成空报告 |\n\n---\n\n## 2. 总体架构设计\n\n### 2.1 分层结构\n\n```mermaid\nflowchart LR\n    U[产品经理 / 开发 / 测试] --> FE[Vue 3 单页工作台]\n    FE --> API[REST API /api/reviews]\n    API --> C[ReviewController]\n    C --> S[ReviewService]\n    C --> D[DocumentService]\n    S --> AI[AiReviewService]\n    AI --> M[Mock 规则]\n    AI --> Q[Qwen 兼容接口]\n    S --> R[ReviewRepository]\n    R --> H2[(H2 文件数据库)]\n```\n\n### 2.2 核心业务闭环\n\n[S034] 软件设计说明书.md / 7. 交互状态与异常设计\n和视觉反馈；\n- 不加入当前后端无法提供的图表、健康分、冲突关系或导出按钮。\n\n---\n\n## 7. 交互状态与异常设计\n\n| 场景 | 前端反馈 | 数据行为 |\n|---|---|---|\n| 空文本 | 开始审查时提示“请先输入或上传需求文本” | 不发请求 |\n| 超过 20,000 字符 | 禁止提交并显示限制 | 不发请求；后端再次校验 |\n| 文件超过 10MB | 上传前提示“文件不能超过 10 MB” | 不上传 |\n| 文件类型不支持 | 显示仅支持 DOCX 和文字型 PDF | 不保存记录 |\n| 空文件/扫描 PDF | 显示无法提取文字 | 不自动审查 |\n| 审查进行中 | 按钮显示“审查处理中”，防止重复提交 | 只允许一次有效请求 |\n| AI 超时/非法 JSON | 显示面向用户的失败原因 | 不保存无效报告 |\n| 报告字段异常 | 显示“报告格式错误/无法展示” | 保留原记录，便于定位 |\n| 追问为空或超长 | 输入区提示 2–2000 字符要求 | 不发请求，不新增版本 |\n| 无历史数据 | 空状态 + 开始第一次审查 | 不显示伪造记录 |\n| 删除失败 | 列表保留，显示错误 | 不改变前端列表 |",
+      "elapsed_ms": 1.26,
+      "answer_rule": "仅依据检索片段作答；无支持片段时返回“资料不足，需人工确认”。"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "id": "KB-001",
+    "source": "README.md",
+    "title": "项目定位与输入方式",
+    "text": "AI需求歧义审查器面向产品经理、开发人员、测试人员和课程实验使用者。用户可以粘贴需求文本，或上传DOCX与文字型PDF，系统生成带原文引用、风险等级、待确认问题和可测试验收标准的结构化报告。"
+  },
+  {
+    "id": "KB-002",
+    "source": "README.md",
+    "title": "启动与模型模式",
+    "text": "项目后端默认使用Mock模式，不需要API Key。接入千问时设置AI_MODE=qwen、DASHSCOPE_API_KEY和QWEN_MODEL。API Key只在后端使用，不会传给浏览器。"
+  },
+  {
+    "id": "KB-003",
+    "source": "需求规格书.md",
+    "title": "文本输入规则",
+    "text": "需求文本不能为空或仅包含空白字符，最大长度为20000个字符。原文在生成报告后必须可回看，不能被系统静默改写。"
+  },
+  {
+    "id": "KB-004",
+    "source": "需求规格书.md",
+    "title": "文件上传规则",
+    "text": "系统支持DOCX和文字型PDF文件上传，单文件最大10MB。文件为空、扩展名不支持、内容无法解析时必须返回明确错误。扫描图片型PDF没有可提取文字时，应提示仅支持文字型PDF。"
+  },
+  {
+    "id": "KB-005",
+    "source": "需求规格书.md",
+    "title": "报告结构",
+    "text": "报告包含summary、riskLevel、counts和issues。每个问题包含id、type、severity、quote、location、explanation、missingConditions、questions、acceptanceCriteria、relatedRoles和reworkRisk。counts必须与问题明细中的风险数量一致。"
+  },
+  {
+    "id": "KB-006",
+    "source": "需求规格书.md",
+    "title": "AI与Mock失败处理",
+    "text": "默认Mock模式必须不依赖API Key。AI服务超时、网络失败、返回非法JSON或字段不符合契约时，系统必须返回可理解错误并记录原因，不能保存无效报告。"
+  },
+  {
+    "id": "KB-007",
+    "source": "需求规格书.md",
+    "title": "追问与版本",
+    "text": "追问不能为空或仅包含空白字符，长度建议限制为2000个字符。追问成功后，新报告成为当前报告，旧报告保存到versions，旧版本不能被静默删除。"
+  },
+  {
+    "id": "KB-008",
+    "source": "需求规格书.md",
+    "title": "安全与隐私",
+    "text": "API Key只能存在后端配置，不能进入前端代码、接口响应或日志。报告内容按文本渲染，防止需求原文中的HTML或脚本被执行。日志不得记录完整API Key。"
+  },
+  {
+    "id": "KB-009",
+    "source": "软件设计说明书.md",
+    "title": "系统架构",
+    "text": "前端使用Vue 3、TypeScript、Vite和Element Plus；后端使用Spring Boot 3、Java 17和REST Controller、Service、Repository；数据使用H2文件数据库；AI包含Mock和可选Qwen通道。"
+  },
+  {
+    "id": "KB-010",
+    "source": "软件设计说明书.md",
+    "title": "文档解析",
+    "text": "文档解析使用Apache POI处理DOCX，使用PDFBox处理文字型PDF。扫描PDF无法提取文字时提示无法读取，不生成空报告。"
+  }
+]

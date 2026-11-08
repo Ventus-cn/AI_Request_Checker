@@ -292,7 +292,7 @@ table(['工具名', '用途', '输入', '返回', '超时', '修改数据'], [
     ['delete_review', '删除档案', 'id（UUID）', 'deleted、id', '5s', '是（需确认）'],
 ], widths=[3.6, 2.8, 4.2, 4.2, 1.2, 1.4], font_size=8.5)
 
-para('参数采用 OpenAI function 的 JSON Schema 结构，程序按 Schema 校验类型、范围、枚举、格式和多余字段。以 list_reviews 为例（其余见附录）：')
+para('参数采用 OpenAI function 的 JSON Schema 结构，程序按 Schema 校验类型、范围、枚举、格式和多余字段。以 list_reviews 为例：')
 code_block('''{
   "type": "object",
   "properties": {
@@ -301,6 +301,23 @@ code_block('''{
   },
   "required": [], "additionalProperties": false
 }''')
+
+para('其余四个工具的参数定义如下（完整结构同 list_reviews，均为 additionalProperties=false）：')
+code_block('''compute_risk_stats
+{"type":"object","properties":{
+  "mode":{"type":"string","enum":["all","全面审查","可测试性","安全与权限"],"default":"all"}},
+ "required":[],"additionalProperties":false}
+
+get_review_detail / delete_review
+{"type":"object","properties":{
+  "id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$"}},
+ "required":["id"],"additionalProperties":false}
+
+search_knowledge
+{"type":"object","properties":{
+  "q":{"type":"string","minLength":2,"maxLength":100},
+  "k":{"type":"integer","minimum":1,"maximum":5,"default":3}},
+ "required":["q"],"additionalProperties":false}''')
 
 tabcap('表3-7 参数校验规则')
 table(['检查项', '规则', '失败反馈（回传模型）'], [
@@ -466,34 +483,7 @@ para('本次实验在 AI 需求歧义审查器上完成了“审查档案分析�
 para('实现过程中体会最深的是三点。第一，能用程序做的事不要交给提示词：白名单、Schema、步数、超时和确认流程一旦写进代码，模型就无法绕过，测试也才有稳定的断言对象。第二，人工确认必须建模成显式状态，而不是让模型在回答里“请用户确认”，否则无法保证写操作真的没有执行。第三，日志和结果检查是排错的核心：真实运行中出现过无依据引用和检索 0 条的情况，正是日志里的阶段、错误类型和检查结果让问题可定位。')
 para('当前局限也很明确：知识库仍用整段汉字匹配，口语化提问召回不足；上下文只做了截断，没有摘要压缩；工具串行执行，尚未利用并行调用；前端仍是单文件页面结构。后续计划把检索改为二字词或向量匹配、为长上下文增加摘要、把“档案分析”拆成独立组件，并在需要多人使用时补充鉴权和审计落库。')
 
-# ===================== 附录 =====================
-h1('附录  工具参数定义与运行说明')
-para('5 个工具的完整参数定义（OpenAI function.parameters 结构）：')
-code_block('''list_reviews
-{"type":"object","properties":{
-  "limit":{"type":"integer","minimum":1,"maximum":20,"default":5},
-  "riskLevel":{"type":"string","enum":["all","high","medium","low"],"default":"all"}},
- "required":[],"additionalProperties":false}
-
-compute_risk_stats
-{"type":"object","properties":{
-  "mode":{"type":"string","enum":["all","全面审查","可测试性","安全与权限"],"default":"all"}},
- "required":[],"additionalProperties":false}
-
-get_review_detail / delete_review
-{"type":"object","properties":{
-  "id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$"}},
- "required":["id"],"additionalProperties":false}
-
-search_knowledge
-{"type":"object","properties":{
-  "q":{"type":"string","minLength":2,"maxLength":100},
-  "k":{"type":"integer","minimum":1,"maximum":5,"default":3}},
- "required":["q"],"additionalProperties":false}''')
-
-para('运行方式：在 backend/.env.local 配置 AI_MODE=qwen、DASHSCOPE_API_KEY、QWEN_MODEL=qwen-plus（该文件不入库），执行 backend/run-local.ps1 与 frontend 的 npm run dev，浏览器打开 http://localhost:5173。可调参数：AGENT_MAX_STEPS=6、AGENT_TOTAL_TIMEOUT_MS=60000、AGENT_TOOL_TIMEOUT_MS=5000、AGENT_MAX_ANSWER_RETRIES=2、AGENT_CONFIRM_TTL_MS=300000、AGENT_LOG_DIR=./logs/agent-runs。')
-
-# 页脚页码
+# ===================== 页脚页码 =====================
 footer_p = doc.sections[0].footer.paragraphs[0]
 footer_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 r1 = footer_p.add_run('第 ')

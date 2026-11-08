@@ -528,6 +528,37 @@ code_block('''if (run.lastStats != null)
 if (run.lastKnowledgeCount == 0 && answer.matches("(?s).*KB-\\\\d+.*"))
   return new Result(false, "回答引用了未检索的知识库编号", "请删除该编号或先检索");''')
 
+# 页脚页码
+footer_p = doc.sections[0].footer.paragraphs[0]
+footer_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+footer_p.paragraph_format.first_line_indent = Pt(0)
+try:
+    run = footer_p.add_run('第 ')
+    run.font.size = Pt(9)
+    run.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+    run.font.name = '宋体'
+    run._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+    fld_begin = OxmlElement('w:fldChar')
+    fld_begin.set(qn('w:fldCharType'), 'begin')
+    instr = OxmlElement('w:instrText')
+    instr.set(qn('xml:space'), 'preserve')
+    instr.text = 'PAGE'
+    fld_end = OxmlElement('w:fldChar')
+    fld_end.set(qn('w:fldCharType'), 'end')
+    run2 = footer_p.add_run()
+    run2.font.size = Pt(9)
+    run2.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+    run2._r.append(fld_begin)
+    run2._r.append(instr)
+    run2._r.append(fld_end)
+    run3 = footer_p.add_run(' 页')
+    run3.font.size = Pt(9)
+    run3.font.color.rgb = RGBColor(0x66, 0x66, 0x66)
+    run3.font.name = '宋体'
+    run3._element.rPr.rFonts.set(qn('w:eastAsia'), '宋体')
+except Exception as exc:  # 页码失败不影响正文
+    print('footer skipped:', exc)
+
 doc.save(str(OUT))
 print(OUT)
 print('size', OUT.stat().st_size)

@@ -12,13 +12,22 @@ public final class AcceptanceDtos {
 
   public record TestSample(String id, String kind, String input, String expected, String sourceQuote) {}
 
-  public record Report(String summary,
+  public record Report(String requirementKind, String summary,
                        List<Criterion> acceptanceCriteria,
                        List<TestSample> testSamples,
-                       List<String> openQuestions) {}
+                       List<String> openQuestions,
+                       List<String> limits) {}
 
   public record Usage(int promptTokens, int completionTokens, int totalTokens) {}
 
+  public record Checks(boolean schemaOk, boolean groundingOk, boolean structureOk,
+                       boolean coverageOk, List<String> messages) {
+    public boolean acceptable() {
+      return schemaOk && groundingOk && structureOk && coverageOk;
+    }
+  }
+
   public record RunResponse(String runId, String status, String promptVersion, String model,
-                            long durationMs, Usage usage, Report report, String error) {}
+                            long durationMs, Usage usage, Report report, Checks checks,
+                            int attempts, String error) {}
 }

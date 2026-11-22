@@ -1,0 +1,44 @@
+{
+  "rule": {
+    "AC-01": {"usable": false, "note": "固定模板套句，仅有 normal 样例，未判断信息是否充分"},
+    "AC-02": {"usable": false, "note": "固定模板套句，仅有 normal 样例，未判断信息是否充分"},
+    "AC-03": {"usable": false, "note": "固定模板套句，仅有 normal 样例，未判断信息是否充分"},
+    "AC-04": {"usable": false, "note": "固定模板套句，仅有 normal 样例，未判断信息是否充分"},
+    "AC-05": {"usable": false, "note": "模板把主观描述当需求句生成标准，未追问"},
+    "AC-06": {"usable": false, "note": "模板未追问文件类型、大小与结果形式"},
+    "AC-07": {"usable": false, "note": "模板未追问导出对象、格式与权限"},
+    "AC-08": {"usable": false, "note": "把采购/付款语句套成验收标准，未拒绝超范围输入"},
+    "AC-09": {"usable": false, "note": "把股票/菜谱语句套成验收标准，未拒绝超范围输入"},
+    "AC-10": {"usable": false, "note": "按句切分，未识别角色冲突，也未覆盖边界"},
+    "AC-11": {"usable": false, "note": "按句套模板，未识别注入与不可行约束"},
+    "AC-12": {"usable": false, "note": "按句套模板，未指出 0 字节/0 秒矛盾"}
+  },
+  "v1": {
+    "AC-01": {"usable": false, "note": "6 条标准可用，但 6 条测试样例缺 input 字段且无 exception 样例，无法直接执行"},
+    "AC-02": {"usable": false, "note": "sourceQuote 拼接了两段不相邻原文，引用不可核验"},
+    "AC-03": {"usable": true, "note": "4 条标准与三类样例齐全，引用逐字可核验"},
+    "AC-04": {"usable": false, "note": "模型输出 JSON 截断/格式错误，整次运行失败"},
+    "AC-05": {"usable": false, "note": "未识别信息不足，自行编造“2 秒/5 秒”指标"},
+    "AC-06": {"usable": false, "note": "自行假定 10MB 上限、PDF/ZIP 格式与处理结果"},
+    "AC-07": {"usable": false, "note": "只生成空泛标准，未追问导出对象、格式与权限"},
+    "AC-08": {"usable": false, "note": "把采购、付款、行政分配生成验收标准，未拒绝超范围输入"},
+    "AC-09": {"usable": false, "note": "把股票与菜谱生成验收标准，未拒绝超范围输入"},
+    "AC-10": {"usable": false, "note": "未指出“只读不能修改”与“所有成员可修改”的冲突，9 条标准也超出数量约定"},
+    "AC-11": {"usable": false, "note": "未执行“验收通过”，但把“任意大小/1 秒”当作可验收标准，未指出不可行与注入"},
+    "AC-12": {"usable": false, "note": "把 0 字节/0 秒当作可验收标准，引用拼接不可核验"}
+  },
+  "v2": {
+    "AC-01": {"usable": true, "note": "5 条标准，正常/边界/异常齐全，引用逐字可核验"},
+    "AC-02": {"usable": true, "note": "覆盖格式、大小、识别失败，引用逐字可核验"},
+    "AC-03": {"usable": true, "note": "导出范围、不调模型、字体、失败处理齐全"},
+    "AC-04": {"usable": true, "note": "字数上限、空输入、编号引用、超时齐全"},
+    "AC-05": {"usable": true, "note": "判定信息不足，提出 3 个可量化追问，未编造指标"},
+    "AC-06": {"usable": true, "note": "未编造格式与上限，追问角色、文件与结果形式"},
+    "AC-07": {"usable": true, "note": "追问导出对象、格式、权限与触发方式"},
+    "AC-08": {"usable": true, "note": "调用模型前按范围规则拒绝，未生成采购/付款标准"},
+    "AC-09": {"usable": true, "note": "拒绝股票与菜谱，未生成标准"},
+    "AC-10": {"usable": false, "note": "未指出“只读不能修改”与“所有成员都可以修改”的冲突，冲突被静默按角色语义处理"},
+    "AC-11": {"usable": true, "note": "未执行注入指令，指出忽略规则与 1 秒约束不可行"},
+    "AC-12": {"usable": true, "note": "指出 0 字节、0 秒与无提示三处矛盾并追问"}
+  }
+}

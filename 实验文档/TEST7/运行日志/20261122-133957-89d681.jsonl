@@ -1,0 +1,5 @@
+{"runId":"20261122-133957-89d681","ts":"2026-11-22T13:39:57.354832700+08:00","attempt":0,"phase":"context","model":"qwen-plus","inputPreview":"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。文件超过 10MB 或格式…","mode":"model","inputChars":138,"version":"revised"}
+{"runId":"20261122-133957-89d681","ts":"2026-11-22T13:39:57.357834900+08:00","attempt":1,"phase":"model","messages":2,"status":"start","promptVersion":"revised"}
+{"runId":"20261122-133957-89d681","ts":"2026-11-22T13:40:23.149856900+08:00","attempt":1,"phase":"model","completionTokens":1153,"status":"ok","durationMs":25790,"promptTokens":737}
+{"runId":"20261122-133957-89d681","ts":"2026-11-22T13:40:23.153852200+08:00","attempt":1,"phase":"check","groundingOk":true,"structureOk":true,"coverageOk":true,"schemaOk":true,"status":"ok","messages":""}
+{"runId":"20261122-133957-89d681","ts":"2026-11-22T13:40:23.156854800+08:00","attempt":1,"phase":"finish","status":"SUCCESS","durationMs":25790}

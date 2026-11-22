@@ -1,0 +1,80 @@
+{
+  "id": "AC-06",
+  "category": "insufficient",
+  "title": "缺少角色与输出",
+  "expectedKind": "insufficient",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133239-800014",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 6824,
+  "backendDurationMs": 6794,
+  "usage": {
+    "promptTokens": 177,
+    "completionTokens": 295,
+    "totalTokens": 472
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 1,
+  "testCount": 3,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "信息不足处理不完整：kind=None, AC=1, 问题=4",
+      "requirementKind=None，期望 insufficient"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "用户能通过上传文件获取处理结果",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "支持文件上传并返回结果",
+        "given": "用户已登录且处于文件上传界面",
+        "when": "用户选择一个有效文件并点击上传按钮",
+        "then": "系统成功接收文件，执行处理，并向用户返回可读的结果（如文本、状态码或可视化输出）",
+        "sourceQuote": "用户可以上传文件然后得到结果。",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "上传一个大小为2MB的PDF文件",
+        "expected": "系统返回处理成功状态及对应结果内容",
+        "sourceQuote": "用户可以上传文件然后得到结果。"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "上传一个大小为9.9MB的ZIP文件（假设系统限制为10MB）",
+        "expected": "系统接受上传并返回有效结果",
+        "sourceQuote": "用户可以上传文件然后得到结果。"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "上传一个空文件（0字节）",
+        "expected": "系统返回明确的错误提示，如'文件不能为空'，不触发结果生成",
+        "sourceQuote": "用户可以上传文件然后得到结果。"
+      }
+    ],
+    "openQuestions": [
+      "文件类型是否有限制？",
+      "文件大小上限是多少？",
+      "‘结果’的具体格式和内容要求是什么？",
+      "上传失败时的错误提示规范是否定义？"
+    ]
+  }
+}

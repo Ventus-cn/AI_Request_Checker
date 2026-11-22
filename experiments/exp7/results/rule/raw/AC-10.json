@@ -1,0 +1,90 @@
+{
+  "id": "AC-10",
+  "category": "boundary",
+  "title": "长需求中的角色冲突",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-bb267e",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 14,
+  "backendDurationMs": 3,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 4,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": false,
+    "messages": [
+      "测试样例未覆盖三类：['normal']",
+      "requirementKind=None，期望 normal",
+      "缺少关键要点：['180']"
+    ],
+    "conflict_flagged": false
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "系统需要支持审查档案的多人协作",
+        "sourceQuote": "系统需要支持审查档案的多人协作",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "档案创建者可以邀请其他成员加入，被邀请成员分为“只读”和“可编辑”两种角色",
+        "sourceQuote": "档案创建者可以邀请其他成员加入，被邀请成员分为“只读”和“可编辑”两种角色",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "需求语句 3",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "只读成员可以查看档案正文、审查结果和导出记录，但不能修改需求文本",
+        "sourceQuote": "只读成员可以查看档案正文、审查结果和导出记录，但不能修改需求文本",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "需求语句 4",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "所有成员都可以修改需求文本并重新发起审查，修改后生成新的版本，旧版本保留可追溯",
+        "sourceQuote": "所有成员都可以修改需求文本并重新发起审查，修改后生成新的版本，旧版本保留可追溯",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "系统需要支持审查档案的多人协作",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "系统需要支持审查档案的多人协作"
+      }
+    ],
+    "openQuestions": []
+  }
+}

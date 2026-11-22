@@ -1,0 +1,88 @@
+{
+  "id": "AC-04",
+  "category": "normal",
+  "title": "审查结果追问",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-8861cd",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 16,
+  "backendDurationMs": 2,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 4,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "测试样例未覆盖三类：['normal']",
+      "requirementKind=None，期望 normal"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "在审查结果页，用户可以在追问输入框输入不超过 200 字的问题，点击“发送”后系统结合当前审查档案回答",
+        "sourceQuote": "在审查结果页，用户可以在追问输入框输入不超过 200 字的问题，点击“发送”后系统结合当前审查档案回答",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "回答应引用档案中的问题编号",
+        "sourceQuote": "回答应引用档案中的问题编号",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "需求语句 3",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "追问超过 10 秒未返回时，页面提示“回答超时，请重试”，并允许重新发送",
+        "sourceQuote": "追问超过 10 秒未返回时，页面提示“回答超时，请重试”，并允许重新发送",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "需求语句 4",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "追问内容为空时，“发送”按钮不可用",
+        "sourceQuote": "追问内容为空时，“发送”按钮不可用",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "在审查结果页，用户可以在追问输入框输入不超过 200 字的问题，点击“发送”后系统结合当前审查档案回答",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "在审查结果页，用户可以在追问输入框输入不超过 200 字的问题，点击“发送”后系统结合当前审查档案回答"
+      }
+    ],
+    "openQuestions": []
+  }
+}

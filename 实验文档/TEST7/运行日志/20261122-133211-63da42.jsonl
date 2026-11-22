@@ -1,0 +1,5 @@
+{"runId":"20261122-133211-63da42","ts":"2026-11-22T13:32:11.480059700+08:00","attempt":0,"phase":"context","version":"original","inputChars":121,"mode":"model","inputPreview":"在审查结果页，用户可以在追问输入框输入不超过 200 字的问题，点击“发送”后系统结合当前审查档案回答。回答应引用档案中的问题编号。追问超过 10 秒未返回时，…","model":"qwen-plus"}
+{"runId":"20261122-133211-63da42","ts":"2026-11-22T13:32:11.485118900+08:00","attempt":1,"phase":"model","promptVersion":"original","status":"start"}
+{"runId":"20261122-133211-63da42","ts":"2026-11-22T13:32:33.073380300+08:00","attempt":1,"phase":"model","durationMs":21586,"status":"ok","completionTokens":964,"promptTokens":245}
+{"runId":"20261122-133211-63da42","ts":"2026-11-22T13:32:33.079929300+08:00","attempt":1,"phase":"parse","message":"输出不是合法 JSON：Unexpected character ('.' (code 46)): was expecting comma to separate Object entries at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 52, column: 19]","errorType":"PARSE_ERROR","status":"error"}
+{"runId":"20261122-133211-63da42","ts":"2026-11-22T13:32:33.081935500+08:00","attempt":1,"phase":"finish","durationMs":21586,"status":"FAILED"}

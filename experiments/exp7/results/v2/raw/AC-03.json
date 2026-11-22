@@ -1,0 +1,103 @@
+{
+  "id": "AC-03",
+  "category": "normal",
+  "title": "审查报告导出 PDF",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-134023-01056f",
+  "promptVersion": "revised",
+  "model": "qwen-plus",
+  "latencyMs": 23352,
+  "backendDurationMs": 23323,
+  "usage": {
+    "promptTokens": 732,
+    "completionTokens": 1042,
+    "totalTokens": 1774
+  },
+  "attempts": 1,
+  "requirementKind": "normal",
+  "acCount": 4,
+  "testCount": 3,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": true,
+    "kindOk": true,
+    "mustMentionOk": true,
+    "messages": []
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "requirementKind": "normal",
+    "summary": "需求明确描述了导出PDF功能的行为、内容范围、技术约束（不调用大模型、中文字体嵌入）、失败处理及日志要求，具备可验证性。",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "导出PDF包含全部发现项、原文引用、验收标准和检索来源，且不受页面筛选影响",
+        "given": "用户已完成审查，当前页面应用了任意筛选条件（如仅显示高风险项）",
+        "when": "用户点击‘导出 PDF’按钮",
+        "then": "生成的PDF文件中完整包含所有审查发现项（无论是否被当前筛选隐藏）、对应原文引用、每项的验收标准、每项的检索来源",
+        "sourceQuote": "报告包含全部发现项、原文引用、验收标准和检索来源，不受页面筛选影响",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "导出过程不调用大模型",
+        "given": "系统已部署大模型服务，且审查报告生成阶段曾调用过大模型",
+        "when": "用户点击‘导出 PDF’按钮并成功触发导出流程",
+        "then": "系统未发起任何对大模型API的HTTP请求或函数调用，导出逻辑完全基于本地结构化数据渲染",
+        "sourceQuote": "导出过程不调用大模型",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "PDF嵌入中文字体以确保跨设备不乱码",
+        "given": "导出的PDF文件在Windows/macOS/Linux任一未预装中文字体的干净环境中打开",
+        "when": "用户双击打开导出的PDF文件",
+        "then": "所有中文字符（包括标题、发现项描述、原文引用、验收标准、检索来源等）均正确显示，无方框、问号或空白替代符",
+        "sourceQuote": "中文字体需要嵌入 PDF，保证在其他电脑上打开时不乱码",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "导出失败时前端提示固定文案并记录错误日志",
+        "given": "PDF生成服务因磁盘满/权限不足/字体文件缺失等异常不可用",
+        "when": "用户点击‘导出 PDF’按钮",
+        "then": "页面弹出提示框显示‘导出失败，请重试’，且后端写入一条含时间戳、错误类型、上下文（如报告ID）的结构化错误日志",
+        "sourceQuote": "生成失败时提示“导出失败，请重试”，并记录错误日志",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "用户处于审查完成状态，页面筛选为‘仅显示中风险及以上’，共12条发现项，其中5条被筛选隐藏",
+        "expected": "导出的PDF共包含全部12条发现项及其原文引用、验收标准、检索来源",
+        "sourceQuote": "报告包含全部发现项、原文引用、验收标准和检索来源，不受页面筛选影响"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "审查报告含2000条发现项，每条含500字原文引用+200字验收标准+100字检索来源，总文本量超10MB",
+        "expected": "PDF成功生成并可正常打开，所有中文字符清晰可读，无截断或内存溢出崩溃",
+        "sourceQuote": "中文字体需要嵌入 PDF，保证在其他电脑上打开时不乱码"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "PDF渲染服务返回500错误（模拟字体嵌入模块初始化失败）",
+        "expected": "前端显示‘导出失败，请重试’，后端日志中存在ERROR级别记录，含‘PDF generation failed’和报告ID字段",
+        "sourceQuote": "生成失败时提示“导出失败，请重试”，并记录错误日志"
+      }
+    ],
+    "openQuestions": [],
+    "limits": [
+      "未定义PDF具体排版样式（如页眉页脚、字体大小、行距），不纳入本次验收；未说明日志存储位置与保留周期；未规定PDF文件名格式（如是否含时间戳或报告ID）"
+    ]
+  }
+}

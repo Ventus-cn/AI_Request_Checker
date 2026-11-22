@@ -1,0 +1,131 @@
+{
+  "id": "AC-02",
+  "category": "normal",
+  "title": "文件上传与解析",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133122-31c18a",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 27624,
+  "backendDurationMs": 27597,
+  "usage": {
+    "promptTokens": 255,
+    "completionTokens": 1240,
+    "totalTokens": 1495
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 6,
+  "testCount": 4,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": false,
+    "coverageOk": true,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "引用无法在原文核验：单个文件不超过 10MB。文件超过 10MB 或格式不支持时",
+      "requirementKind=None，期望 normal"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "系统支持上传并解析 DOCX 和 PDF 格式的需求文档，限制单文件 ≤10MB，解析超时≤60秒；对不合规文件给出明确拒绝提示，扫描版PDF需调用视觉模型识别并标注失败页范围。",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "支持 DOCX 和 PDF 格式上传",
+        "given": "用户访问文件上传页面",
+        "when": "用户选择一个 .docx 文件",
+        "then": "系统接受该文件并开始解析",
+        "sourceQuote": "用户可以上传 DOCX 或 PDF 格式的需求文档",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "拒绝非支持格式文件",
+        "given": "用户访问文件上传页面",
+        "when": "用户选择一个 .xlsx 文件",
+        "then": "页面提示“仅支持 DOCX 和 PDF 格式”，且不触发上传流程",
+        "sourceQuote": "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "拒绝超 10MB 文件",
+        "given": "用户访问文件上传页面",
+        "when": "用户选择一个大小为 10.1MB 的 PDF 文件",
+        "then": "页面提示“文件大小不能超过 10MB”，且不触发上传流程",
+        "sourceQuote": "单个文件不超过 10MB。文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "解析时间上限为 60 秒",
+        "given": "用户已成功上传一个 9.8MB 的含图 PDF 文件",
+        "when": "系统启动解析流程",
+        "then": "解析在 60 秒内完成（含正文与图片提取），或超时后中止并返回错误提示",
+        "sourceQuote": "上传后系统解析正文和内嵌图片，解析时间不超过 60 秒",
+        "priority": "must"
+      },
+      {
+        "id": "AC-5",
+        "title": "扫描版 PDF 调用视觉模型识别",
+        "given": "用户上传一个扫描版 PDF（无可选文本层）",
+        "when": "系统检测到 PDF 为图像型",
+        "then": "自动调用视觉识别模型处理每一页",
+        "sourceQuote": "扫描版 PDF 需要调用视觉模型识别",
+        "priority": "must"
+      },
+      {
+        "id": "AC-6",
+        "title": "识别失败页面需标注未识别范围",
+        "given": "视觉模型对某扫描页识别失败（如置信度<0.3）",
+        "when": "解析完成并生成结果",
+        "then": "结果中标注该页为‘第X页：识别失败’或类似明确标识",
+        "sourceQuote": "识别失败的页面应在结果中标注未识别范围",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "上传一个 2.3MB 的 DOCX 文件（含 3 张内嵌 PNG 图片）",
+        "expected": "解析成功，返回完整正文文本及 3 张图片的 base64 编码，总耗时 ≤60 秒",
+        "sourceQuote": "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "上传一个恰好 10MB 的 PDF 文件（含文字层）",
+        "expected": "解析成功，返回正文与图片，总耗时 ≤60 秒",
+        "sourceQuote": "单个文件不超过 10MB"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "上传一个 12MB 的 PDF 文件",
+        "expected": "前端立即阻止上传，显示提示：“文件大小不能超过 10MB”",
+        "sourceQuote": "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传"
+      },
+      {
+        "id": "TS-4",
+        "kind": "normal",
+        "input": "上传一个 5MB 扫描版 PDF（共 8 页，其中第 4、7 页因模糊识别失败）",
+        "expected": "解析结果包含前 3 页、第 5–6 页、第 8 页的文本与图片；第 4 页和第 7 页标注为‘识别失败’",
+        "sourceQuote": "扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围"
+      }
+    ],
+    "openQuestions": [
+      "视觉模型识别失败的具体判定标准（如置信度阈值、超时阈值）是否已定义？",
+      "‘未识别范围’是否需精确到段落/区域，还是仅需页级标注？",
+      "解析超时后是否需提供重试机制或部分结果返回？"
+    ]
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "id": "AC-09",
+  "category": "out_of_scope",
+  "title": "股票与菜谱建议",
+  "expectedKind": "out_of_scope",
+  "httpStatus": 200,
+  "status": "REFUSED",
+  "error": null,
+  "runId": "20261122-134124-86c2f5",
+  "promptVersion": "revised",
+  "model": "qwen-plus",
+  "latencyMs": 11,
+  "backendDurationMs": 2,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": 0,
+  "requirementKind": "out_of_scope",
+  "acCount": 0,
+  "testCount": 0,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": false,
+    "groundingOk": false,
+    "coverageOk": true,
+    "kindOk": true,
+    "mustMentionOk": true,
+    "messages": [
+      "存在 Given/When/Then 缺项",
+      "没有任何原文引用"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "requirementKind": "out_of_scope",
+    "summary": "当前输入不是软件需求，已拒绝生成验收标准。",
+    "acceptanceCriteria": [],
+    "testSamples": [],
+    "openQuestions": [
+      "请提交软件功能需求原文（角色、输入、输出、边界与验收口径）。",
+      "如需审查采购、付款、股票等非软件事项，请使用对应业务系统或人工流程。"
+    ],
+    "limits": [
+      "程序在调用模型前按范围规则拒绝，未产生费用。"
+    ]
+  }
+}

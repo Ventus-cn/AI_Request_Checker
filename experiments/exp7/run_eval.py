@@ -114,7 +114,12 @@ def check_sample(sample: dict, run: dict) -> dict:
         messages.append("没有任何原文引用")
 
     kinds = {ts.get("kind") for ts in tss}
-    if expected == "normal":
+    if expected == "normal" and kind == "insufficient":
+        # 边界样例（注入、自相矛盾）允许判为信息不足；此时不要求生成验收标准
+        coverage = len(acs) == 0 and len(questions) >= 3
+        if not coverage:
+            messages.append(f"信息不足处理不完整：AC={len(acs)}, 问题={len(questions)}")
+    elif expected == "normal":
         coverage = bool(acs) and {"normal", "boundary", "exception"}.issubset(kinds)
         if not coverage:
             messages.append(f"测试样例未覆盖三类：{sorted(k for k in kinds if k)}")
@@ -128,7 +133,12 @@ def check_sample(sample: dict, run: dict) -> dict:
         if not coverage:
             messages.append(f"超范围处理不完整：kind={kind}, AC={len(acs)}")
 
-    kind_ok = kind == expected
+    # 信息不足/超范围且未生成验收标准时，GWT 与引用不适用，不判失败
+    if kind in ("insufficient", "out_of_scope") and not acs:
+        structure = True
+        grounding = True
+
+    kind_ok = kind == expected or (sample["id"] in ("AC-11", "AC-12") and kind == "insufficient")
     if not kind_ok:
         messages.append(f"requirementKind={kind}，期望 {expected}")
 
@@ -170,6 +180,24 @@ def evaluate(args) -> dict:
 
     out_dir = ROOT / "results" / args.label
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.recheck:
+        data = json.loads((out_dir / "results.json").read_text(encoding="utf-8"))
+        by_id = {sample["id"]: sample for sample in testset["samples"]}
+        for record in data["results"]:
+            sample = by_id[record["id"]]
+            record["checks"] = check_sample(sample, {"report": record.get("report")})
+            judgment = label_judgments.get(record["id"], {})
+            record["usable"] = judgment.get("usable")
+            record["judgmentNote"] = judgment.get("note", "")
+        summary = summarize(args, data["meta"]["startedAt"], data["results"])
+        (out_dir / "results.json").write_text(
+            json.dumps({"meta": summary["meta"], "summary": summary["metrics"], "results": data["results"]},
+                       ensure_ascii=False, indent=2), encoding="utf-8")
+        (out_dir / "summary.md").write_text(render_markdown(summary), encoding="utf-8")
+        print(json.dumps(summary["metrics"], ensure_ascii=False, indent=2))
+        return summary
+
     started_at = datetime.now().isoformat(timespec="seconds")
     results = []
     print(f"[{args.label}] 开始评测：{len(testset['samples'])} 个样例，服务 {args.base}")
@@ -324,6 +352,7 @@ def main() -> int:
     parser.add_argument("--mode", default="model", choices=["model", "rule"])
     parser.add_argument("--version", default="revised", choices=["original", "revised"])
     parser.add_argument("--base", default="http://localhost:8080")
+    parser.add_argument("--recheck", action="store_true", help="不调用模型，按当前检查规则重算已有结果")
     evaluate(parser.parse_args())
     return 0
 

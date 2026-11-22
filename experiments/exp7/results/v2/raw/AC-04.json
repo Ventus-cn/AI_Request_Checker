@@ -1,0 +1,109 @@
+{
+  "id": "AC-04",
+  "category": "normal",
+  "title": "审查结果追问",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-134046-4f216c",
+  "promptVersion": "revised",
+  "model": "qwen-plus",
+  "latencyMs": 23628,
+  "backendDurationMs": 23604,
+  "usage": {
+    "promptTokens": 727,
+    "completionTokens": 1055,
+    "totalTokens": 1782
+  },
+  "attempts": 1,
+  "requirementKind": "normal",
+  "acCount": 4,
+  "testCount": 3,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": true,
+    "kindOk": true,
+    "mustMentionOk": true,
+    "messages": []
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "requirementKind": "normal",
+    "summary": "需求明确描述了审查结果页中追问功能的输入限制、交互行为、响应引用规则、超时处理及空输入禁用逻辑，具备完整可验证要素。",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "追问输入框支持不超过200字的问题输入",
+        "given": "用户位于审查结果页，追问输入框为空或已输入部分文字",
+        "when": "用户在追问输入框中输入恰好200个汉字（或等长UTF-8字符）后停止输入",
+        "then": "输入框允许提交，且不截断、不报错",
+        "sourceQuote": "用户可以在追问输入框输入不超过 200 字的问题",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "追问内容为空时发送按钮禁用",
+        "given": "用户位于审查结果页，追问输入框内无任何字符（包括空格、换行）",
+        "when": "用户聚焦追问输入框后直接离开，或手动清空全部内容",
+        "then": "‘发送’按钮处于禁用状态（不可点击，视觉呈现为disabled）",
+        "sourceQuote": "追问内容为空时，“发送”按钮不可用。",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "系统回答必须引用档案中的问题编号",
+        "given": "用户提交一个非空追问，且后端成功返回回答",
+        "when": "系统完成回答生成并渲染到页面",
+        "then": "回答文本中至少出现一次以‘问题#X’或类似格式（如‘Q1’‘第X问’）明确标识的原始档案问题编号",
+        "sourceQuote": "系统结合当前审查档案回答。回答应引用档案中的问题编号。",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "追问响应超时10秒触发提示并恢复发送能力",
+        "given": "用户已输入有效追问内容，‘发送’按钮处于可用状态",
+        "when": "用户点击‘发送’后，系统在10秒内未返回任何回答（含HTTP超时、空响应、解析失败）",
+        "then": "页面显示提示文字‘回答超时，请重试’，且‘发送’按钮重新变为可用状态",
+        "sourceQuote": "追问超过 10 秒未返回时，页面提示“回答超时，请重试”，并允许重新发送。",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "追问输入框内容为'请解释问题#3的判定依据？'",
+        "expected": "系统返回包含'问题#3'或等效编号引用的回答文本",
+        "sourceQuote": "系统结合当前审查档案回答。回答应引用档案中的问题编号。"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "追问输入框内容为200个连续中文字符（如：一……一）",
+        "expected": "系统接受该输入并成功提交，无截断或长度校验失败提示",
+        "sourceQuote": "用户可以在追问输入框输入不超过 200 字的问题"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "追问输入框为空字符串",
+        "expected": "‘发送’按钮始终不可点击，且无其他交互反馈",
+        "sourceQuote": "追问内容为空时，“发送”按钮不可用。"
+      }
+    ],
+    "openQuestions": [
+      "原文未明确‘问题编号’的具体格式（如是否含前缀‘问题#’、是否允许纯数字、是否区分大小写），需确认引用格式规范",
+      "‘结合当前审查档案回答’是否要求回答必须严格基于档案已有信息，禁止补充外部知识？需确认回答的内容边界",
+      "超时判定是前端计时还是后端响应超时？若网络延迟导致前端10秒未收响应但后端仍在处理，是否允许重复发送导致重复请求？需确认超时机制归属与并发控制策略"
+    ],
+    "limits": [
+      "未覆盖多轮追问上下文保持逻辑（原文未提及历史问答是否影响本次回答）",
+      "未覆盖回答内容长度、格式（如富文本/纯文本）、渲染位置等UI细节",
+      "未覆盖‘发送’按钮禁用状态是否需实时监听输入变化（如粘贴后立即校验），仅按最终状态验证"
+    ]
+  }
+}

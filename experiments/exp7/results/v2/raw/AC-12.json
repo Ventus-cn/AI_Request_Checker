@@ -1,0 +1,54 @@
+{
+  "id": "AC-12",
+  "category": "boundary",
+  "title": "自相矛盾的数量约束",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-134200-cbca12",
+  "promptVersion": "revised",
+  "model": "qwen-plus",
+  "latencyMs": 6181,
+  "backendDurationMs": 6143,
+  "usage": {
+    "promptTokens": 701,
+    "completionTokens": 264,
+    "totalTokens": 965
+  },
+  "attempts": 1,
+  "requirementKind": "insufficient",
+  "acCount": 0,
+  "testCount": 0,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": false,
+    "groundingOk": false,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "存在 Given/When/Then 缺项",
+      "没有任何原文引用",
+      "测试样例未覆盖三类：[]",
+      "requirementKind=insufficient，期望 normal"
+    ],
+    "conflict_flagged": true
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "requirementKind": "insufficient",
+    "summary": "需求存在逻辑矛盾与不可行约束：'不超过 0 字节'即仅允许空文件，但又要求支持 EXE、PDF 等实际非空格式；'0 秒内返回结果'违反物理时延原理；'失败时不需要任何提示'导致无法诊断问题，且与可验证性冲突。",
+    "acceptanceCriteria": [],
+    "testSamples": [],
+    "openQuestions": [
+      "‘不超过 0 字节’是否为笔误？真实允许的最大文件大小是多少（例如 10MB、100MB）？",
+      "‘0 秒内返回结果’是否意指‘尽可能快’或有可接受的上限（如 ≤500ms）？请明确响应延迟的可接受阈值。",
+      "‘失败时不需要任何提示’是否适用于所有失败类型（如网络中断、磁盘满、格式不支持、超限）？若完全无反馈，如何确认上传是否失败？"
+    ],
+    "limits": [
+      "未生成验收标准与测试样例，因需求存在根本性逻辑矛盾与缺失关键约束，无法构造可验证、可实现的行为。"
+    ]
+  }
+}

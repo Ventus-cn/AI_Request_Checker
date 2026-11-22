@@ -1,0 +1,1209 @@
+{
+  "meta": {
+    "label": "v1",
+    "mode": "model",
+    "promptVersion": "original",
+    "base": "http://localhost:8080",
+    "startedAt": "2026-11-22T13:30:55",
+    "finishedAt": "2026-11-22T13:43:58",
+    "priceNote": "估算单价：输入 0.0008 元/千Token，输出 0.002 元/千Token"
+  },
+  "summary": {
+    "n": 12,
+    "schemaRate": 0.833,
+    "groundingRate": 0.75,
+    "structureRate": 0.917,
+    "coverageRate": 0.333,
+    "kindRate": 0.0,
+    "mustMentionRate": 0.917,
+    "usableRate": 0.083,
+    "usableCount": 1,
+    "judgedCount": 12,
+    "avgLatencyMs": 17050,
+    "p90LatencyMs": 27147,
+    "promptTokens": 2722,
+    "completionTokens": 9077,
+    "totalTokens": 11799,
+    "estimatedCostCny": 0.0203,
+    "failedRuns": 1,
+    "checkFailedRuns": 0
+  },
+  "results": [
+    {
+      "id": "AC-01",
+      "category": "normal",
+      "title": "登录与角色权限",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133055-e9f30b",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 27147,
+      "backendDurationMs": 27075,
+      "usage": {
+        "promptTokens": 265,
+        "completionTokens": 1208,
+        "totalTokens": 1473
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 6,
+      "testCount": 6,
+      "checks": {
+        "schemaOk": false,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "测试样例缺少 input",
+          "测试样例缺少 input",
+          "测试样例缺少 input",
+          "测试样例缺少 input",
+          "测试样例未覆盖三类：['boundary', 'normal']",
+          "requirementKind=None，期望 normal"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "6 条标准可用，但 6 条测试样例缺 input 字段且无 exception 样例，无法直接执行",
+      "report": {
+        "summary": "系统需实现带安全策略和权限控制的用户登录功能，包括响应时间、错误提示、账号锁定、会话超时及数据访问控制。",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "登录响应时间符合要求",
+            "given": "用户在登录页正确输入已注册的用户名和密码",
+            "when": "点击“登录”按钮",
+            "then": "系统在2秒内返回登录成功响应并跳转至主页",
+            "sourceQuote": "系统在 2 秒内返回结果",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "错误凭证提示准确",
+            "given": "用户在登录页输入不存在的用户名或错误密码",
+            "when": "点击“登录”按钮",
+            "then": "页面显示提示信息“用户名或密码错误”",
+            "sourceQuote": "用户名或密码错误时，页面提示“用户名或密码错误”",
+            "priority": "must"
+          },
+          {
+            "id": "AC-3",
+            "title": "账号锁定机制生效",
+            "given": "同一账号连续5次登录失败（用户名或密码错误）",
+            "when": "第5次失败后立即尝试第6次登录",
+            "then": "系统拒绝登录并提示“账号已被锁定，请10分钟后重试”",
+            "sourceQuote": "连续失败 5 次后锁定账号 10 分钟",
+            "priority": "must"
+          },
+          {
+            "id": "AC-4",
+            "title": "管理员与普通用户数据访问权限隔离",
+            "given": "用户已成功登录且角色为管理员",
+            "when": "访问审查档案列表页",
+            "then": "可查看全部审查档案",
+            "sourceQuote": "管理员登录后可以查看全部审查档案，普通用户只能查看自己创建的档案",
+            "priority": "must"
+          },
+          {
+            "id": "AC-5",
+            "title": "普通用户仅能访问自有档案",
+            "given": "用户已成功登录且角色为普通用户",
+            "when": "访问审查档案列表页",
+            "then": "仅显示该用户创建的审查档案，不显示其他用户创建的档案",
+            "sourceQuote": "管理员登录后可以查看全部审查档案，普通用户只能查看自己创建的档案",
+            "priority": "must"
+          },
+          {
+            "id": "AC-6",
+            "title": "登录状态超时自动失效",
+            "given": "用户已成功登录且30分钟内无任何操作",
+            "when": "30分钟后发起任意受保护资源请求（如访问档案列表）",
+            "then": "系统重定向至登录页，并清空会话状态",
+            "sourceQuote": "登录状态保持 30 分钟，超时后需要重新登录",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "",
+            "expected": "登录成功，跳转至主页，响应时间 ≤2000ms",
+            "sourceQuote": "系统在 2 秒内返回结果"
+          },
+          {
+            "id": "TS-2",
+            "kind": "normal",
+            "input": "",
+            "expected": "页面显示‘用户名或密码错误’",
+            "sourceQuote": "用户名或密码错误时，页面提示“用户名或密码错误”"
+          },
+          {
+            "id": "TS-3",
+            "kind": "boundary",
+            "input": "第5次连续错误登录（相同账号）",
+            "expected": "登录失败，但账号未被锁定；第6次立即尝试时被锁定并提示锁定信息",
+            "sourceQuote": "连续失败 5 次后锁定账号 10 分钟"
+          },
+          {
+            "id": "TS-4",
+            "kind": "normal",
+            "input": "",
+            "expected": "登录后可访问并列出全部审查档案",
+            "sourceQuote": "管理员登录后可以查看全部审查档案"
+          },
+          {
+            "id": "TS-5",
+            "kind": "normal",
+            "input": "",
+            "expected": "登录后仅列出 user1 创建的审查档案",
+            "sourceQuote": "普通用户只能查看自己创建的档案"
+          },
+          {
+            "id": "TS-6",
+            "kind": "boundary",
+            "input": "用户登录后静默等待30分01秒，再点击档案列表链接",
+            "expected": "重定向至登录页，原会话不可用",
+            "sourceQuote": "登录状态保持 30 分钟，超时后需要重新登录"
+          }
+        ],
+        "openQuestions": [
+          "账号锁定是否基于IP+用户名组合，还是仅用户名？",
+          "管理员角色如何定义和分配？是否支持动态角色变更？",
+          "‘审查档案’的数据模型是否包含明确的创建者字段（如creator_id）？",
+          "登录响应时间2秒是指前端渲染完成，还是后端API返回时间？"
+        ]
+      }
+    },
+    {
+      "id": "AC-02",
+      "category": "normal",
+      "title": "文件上传与解析",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133122-31c18a",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 27624,
+      "backendDurationMs": 27597,
+      "usage": {
+        "promptTokens": 255,
+        "completionTokens": 1240,
+        "totalTokens": 1495
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 6,
+      "testCount": 4,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": false,
+        "coverageOk": true,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "引用无法在原文核验：单个文件不超过 10MB。文件超过 10MB 或格式不支持时",
+          "requirementKind=None，期望 normal"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "sourceQuote 拼接了两段不相邻原文，引用不可核验",
+      "report": {
+        "summary": "系统支持上传并解析 DOCX 和 PDF 格式的需求文档，限制单文件 ≤10MB，解析超时≤60秒；对不合规文件给出明确拒绝提示，扫描版PDF需调用视觉模型识别并标注失败页范围。",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "支持 DOCX 和 PDF 格式上传",
+            "given": "用户访问文件上传页面",
+            "when": "用户选择一个 .docx 文件",
+            "then": "系统接受该文件并开始解析",
+            "sourceQuote": "用户可以上传 DOCX 或 PDF 格式的需求文档",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "拒绝非支持格式文件",
+            "given": "用户访问文件上传页面",
+            "when": "用户选择一个 .xlsx 文件",
+            "then": "页面提示“仅支持 DOCX 和 PDF 格式”，且不触发上传流程",
+            "sourceQuote": "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传",
+            "priority": "must"
+          },
+          {
+            "id": "AC-3",
+            "title": "拒绝超 10MB 文件",
+            "given": "用户访问文件上传页面",
+            "when": "用户选择一个大小为 10.1MB 的 PDF 文件",
+            "then": "页面提示“文件大小不能超过 10MB”，且不触发上传流程",
+            "sourceQuote": "单个文件不超过 10MB。文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传",
+            "priority": "must"
+          },
+          {
+            "id": "AC-4",
+            "title": "解析时间上限为 60 秒",
+            "given": "用户已成功上传一个 9.8MB 的含图 PDF 文件",
+            "when": "系统启动解析流程",
+            "then": "解析在 60 秒内完成（含正文与图片提取），或超时后中止并返回错误提示",
+            "sourceQuote": "上传后系统解析正文和内嵌图片，解析时间不超过 60 秒",
+            "priority": "must"
+          },
+          {
+            "id": "AC-5",
+            "title": "扫描版 PDF 调用视觉模型识别",
+            "given": "用户上传一个扫描版 PDF（无可选文本层）",
+            "when": "系统检测到 PDF 为图像型",
+            "then": "自动调用视觉识别模型处理每一页",
+            "sourceQuote": "扫描版 PDF 需要调用视觉模型识别",
+            "priority": "must"
+          },
+          {
+            "id": "AC-6",
+            "title": "识别失败页面需标注未识别范围",
+            "given": "视觉模型对某扫描页识别失败（如置信度<0.3）",
+            "when": "解析完成并生成结果",
+            "then": "结果中标注该页为‘第X页：识别失败’或类似明确标识",
+            "sourceQuote": "识别失败的页面应在结果中标注未识别范围",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "上传一个 2.3MB 的 DOCX 文件（含 3 张内嵌 PNG 图片）",
+            "expected": "解析成功，返回完整正文文本及 3 张图片的 base64 编码，总耗时 ≤60 秒",
+            "sourceQuote": "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "上传一个恰好 10MB 的 PDF 文件（含文字层）",
+            "expected": "解析成功，返回正文与图片，总耗时 ≤60 秒",
+            "sourceQuote": "单个文件不超过 10MB"
+          },
+          {
+            "id": "TS-3",
+            "kind": "exception",
+            "input": "上传一个 12MB 的 PDF 文件",
+            "expected": "前端立即阻止上传，显示提示：“文件大小不能超过 10MB”",
+            "sourceQuote": "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传"
+          },
+          {
+            "id": "TS-4",
+            "kind": "normal",
+            "input": "上传一个 5MB 扫描版 PDF（共 8 页，其中第 4、7 页因模糊识别失败）",
+            "expected": "解析结果包含前 3 页、第 5–6 页、第 8 页的文本与图片；第 4 页和第 7 页标注为‘识别失败’",
+            "sourceQuote": "扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围"
+          }
+        ],
+        "openQuestions": [
+          "视觉模型识别失败的具体判定标准（如置信度阈值、超时阈值）是否已定义？",
+          "‘未识别范围’是否需精确到段落/区域，还是仅需页级标注？",
+          "解析超时后是否需提供重试机制或部分结果返回？"
+        ]
+      }
+    },
+    {
+      "id": "AC-03",
+      "category": "normal",
+      "title": "审查报告导出 PDF",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133150-94c50b",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 21214,
+      "backendDurationMs": 21158,
+      "usage": {
+        "promptTokens": 250,
+        "completionTokens": 946,
+        "totalTokens": 1196
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 4,
+      "testCount": 3,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": true,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "requirementKind=None，期望 normal"
+        ]
+      },
+      "usable": true,
+      "judgmentNote": "4 条标准与三类样例齐全，引用逐字可核验",
+      "report": {
+        "summary": "支持用户导出包含全部审查发现项、原文引用、验收标准和检索来源的PDF报告，要求中文字体嵌入且不依赖大模型，失败时给出明确提示并记录日志。",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "导出内容完整性",
+            "given": "审查已完成，页面上存在筛选条件（如按严重等级、状态等）",
+            "when": "用户点击“导出 PDF”按钮",
+            "then": "生成的PDF包含所有审查发现项（无论是否被当前页面筛选隐藏），以及每项对应的原文引用、验收标准和检索来源",
+            "sourceQuote": "报告包含全部发现项、原文引用、验收标准和检索来源，不受页面筛选影响。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "导出过程无大模型调用",
+            "given": "系统已部署且大模型服务可用或不可用",
+            "when": "用户触发PDF导出",
+            "then": "后端未发起任何大模型API请求，导出逻辑完全基于本地数据与模板渲染",
+            "sourceQuote": "导出过程不调用大模型。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-3",
+            "title": "中文字体嵌入保障显示一致性",
+            "given": "PDF在Windows/macOS/Linux等不同操作系统上打开",
+            "when": "用户打开导出的PDF文件",
+            "then": "所有中文字符正确显示、无乱码、无字体替换警告",
+            "sourceQuote": "中文字体需要嵌入 PDF，保证在其他电脑上打开时不乱码。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-4",
+            "title": "导出失败处理与可观测性",
+            "given": "导出过程中发生异常（如磁盘满、模板缺失、字体加载失败等）",
+            "when": "用户点击“导出 PDF”按钮",
+            "then": "前端显示提示‘导出失败，请重试’，且后端记录结构化错误日志（含时间、用户ID、错误类型、堆栈）",
+            "sourceQuote": "生成失败时提示“导出失败，请重试”，并记录错误日志。",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "审查完成，页面筛选为‘仅显示高危项’，共10条发现项，其中3条为高危；点击‘导出 PDF’",
+            "expected": "PDF包含全部10条发现项及其原文引用、验收标准、检索来源",
+            "sourceQuote": "报告包含全部发现项、原文引用、验收标准和检索来源，不受页面筛选影响。"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "审查报告含500+条发现项，含长段落中文、特殊符号（如「」、①）、英文混排",
+            "expected": "PDF成功生成，所有文字清晰可读，无截断、重叠或乱码；字体嵌入完整",
+            "sourceQuote": "中文字体需要嵌入 PDF，保证在其他电脑上打开时不乱码。"
+          },
+          {
+            "id": "TS-3",
+            "kind": "exception",
+            "input": "模拟PDF模板文件丢失场景，用户点击‘导出 PDF’",
+            "expected": "前端弹出提示‘导出失败，请重试’；后端日志记录ERROR级别错误，含异常类名与上下文",
+            "sourceQuote": "生成失败时提示“导出失败，请重试”，并记录错误日志。"
+          }
+        ],
+        "openQuestions": [
+          "是否对PDF文件名有命名规范要求（如含项目名、时间戳、版本号）？",
+          "错误日志需记录到哪个具体系统（如ELK、Sentry、本地文件）？",
+          "是否要求PDF符合特定标准（如PDF/A-1b）以满足归档合规性？"
+        ]
+      }
+    },
+    {
+      "id": "AC-04",
+      "category": "normal",
+      "title": "审查结果追问",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "FAILED",
+      "error": "输出不是合法 JSON：Unexpected character ('.' (code 46)): was expecting comma to separate Object entries\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 52, column: 19]",
+      "runId": "20261122-133211-63da42",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 21614,
+      "backendDurationMs": 21586,
+      "usage": {
+        "promptTokens": 245,
+        "completionTokens": 964,
+        "totalTokens": 1209
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 0,
+      "testCount": 0,
+      "checks": {
+        "schemaOk": false,
+        "structureOk": false,
+        "groundingOk": false,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": false,
+        "messages": [
+          "缺少 summary",
+          "存在 Given/When/Then 缺项",
+          "没有任何原文引用",
+          "测试样例未覆盖三类：[]",
+          "requirementKind=None，期望 normal",
+          "缺少关键要点：['200', '10']"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "模型输出 JSON 截断/格式错误，整次运行失败",
+      "report": null
+    },
+    {
+      "id": "AC-05",
+      "category": "insufficient",
+      "title": "只有主观描述",
+      "expectedKind": "insufficient",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133233-936a96",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 6706,
+      "backendDurationMs": 6654,
+      "usage": {
+        "promptTokens": 178,
+        "completionTokens": 288,
+        "totalTokens": 466
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 1,
+      "testCount": 2,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "信息不足处理不完整：kind=None, AC=1, 问题=3",
+          "requirementKind=None，期望 insufficient"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "未识别信息不足，自行编造“2 秒/5 秒”指标",
+      "report": {
+        "summary": "提升系统响应速度以改善用户体验",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "关键操作响应时间达标",
+            "given": "系统处于正常负载状态",
+            "when": "用户执行典型业务操作（如页面加载、表单提交、搜索查询）",
+            "then": "95%的请求响应时间 ≤ 2秒，最大响应时间 ≤ 5秒",
+            "sourceQuote": "系统要快一点，用户体验好一些。",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "用户在首页点击搜索按钮并输入关键词“测试”",
+            "expected": "搜索结果页面在2秒内完全渲染并可交互",
+            "sourceQuote": "系统要快一点，用户体验好一些。"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "并发100用户同时提交订单",
+            "expected": "95%订单提交请求响应时间 ≤ 2秒，无超时或错误提示",
+            "sourceQuote": "系统要快一点，用户体验好一些。"
+          }
+        ],
+        "openQuestions": [
+          "‘快一点’的具体性能指标（如P95响应时间、首屏加载时间）是否已有定义？",
+          "‘用户体验好一些’是否包含可量化的可用性指标（如任务完成率、错误率、满意度NPS）？",
+          "需明确‘正常负载状态’的基准（如并发用户数、数据规模、硬件配置）"
+        ]
+      }
+    },
+    {
+      "id": "AC-06",
+      "category": "insufficient",
+      "title": "缺少角色与输出",
+      "expectedKind": "insufficient",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133239-800014",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 6824,
+      "backendDurationMs": 6794,
+      "usage": {
+        "promptTokens": 177,
+        "completionTokens": 295,
+        "totalTokens": 472
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 1,
+      "testCount": 3,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "信息不足处理不完整：kind=None, AC=1, 问题=4",
+          "requirementKind=None，期望 insufficient"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "自行假定 10MB 上限、PDF/ZIP 格式与处理结果",
+      "report": {
+        "summary": "用户能通过上传文件获取处理结果",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "支持文件上传并返回结果",
+            "given": "用户已登录且处于文件上传界面",
+            "when": "用户选择一个有效文件并点击上传按钮",
+            "then": "系统成功接收文件，执行处理，并向用户返回可读的结果（如文本、状态码或可视化输出）",
+            "sourceQuote": "用户可以上传文件然后得到结果。",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "上传一个大小为2MB的PDF文件",
+            "expected": "系统返回处理成功状态及对应结果内容",
+            "sourceQuote": "用户可以上传文件然后得到结果。"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "上传一个大小为9.9MB的ZIP文件（假设系统限制为10MB）",
+            "expected": "系统接受上传并返回有效结果",
+            "sourceQuote": "用户可以上传文件然后得到结果。"
+          },
+          {
+            "id": "TS-3",
+            "kind": "exception",
+            "input": "上传一个空文件（0字节）",
+            "expected": "系统返回明确的错误提示，如'文件不能为空'，不触发结果生成",
+            "sourceQuote": "用户可以上传文件然后得到结果。"
+          }
+        ],
+        "openQuestions": [
+          "文件类型是否有限制？",
+          "文件大小上限是多少？",
+          "‘结果’的具体格式和内容要求是什么？",
+          "上传失败时的错误提示规范是否定义？"
+        ]
+      }
+    },
+    {
+      "id": "AC-07",
+      "category": "insufficient",
+      "title": "只有一个功能名",
+      "expectedKind": "insufficient",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133246-884686",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 4978,
+      "backendDurationMs": 4931,
+      "usage": {
+        "promptTokens": 175,
+        "completionTokens": 205,
+        "totalTokens": 380
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 1,
+      "testCount": 1,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "信息不足处理不完整：kind=None, AC=1, 问题=5",
+          "requirementKind=None，期望 insufficient"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "只生成空泛标准，未追问导出对象、格式与权限",
+      "report": {
+        "summary": "系统需提供导出功能",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "用户可触发导出操作",
+            "given": "用户已登录并处于支持导出的数据列表页面",
+            "when": "点击‘导出’按钮",
+            "then": "系统开始准备导出数据，显示进度提示或进入导出流程",
+            "sourceQuote": "增加一个导出功能。",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "在数据列表页点击‘导出’按钮",
+            "expected": "系统响应导出请求，无报错，进入导出处理状态",
+            "sourceQuote": "增加一个导出功能。"
+          }
+        ],
+        "openQuestions": [
+          "导出的数据格式（如CSV、Excel、PDF）？",
+          "导出的数据范围（当前页/全部数据/筛选后数据）？",
+          "是否需要导出权限控制？",
+          "导出文件命名规则和存储位置？",
+          "导出失败时的错误提示和重试机制？"
+        ]
+      }
+    },
+    {
+      "id": "AC-08",
+      "category": "out_of_scope",
+      "title": "硬件采购与付款审批",
+      "expectedKind": "out_of_scope",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133251-96a09a",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 17114,
+      "backendDurationMs": 17077,
+      "usage": {
+        "promptTokens": 204,
+        "completionTokens": 761,
+        "totalTokens": 965
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 3,
+      "testCount": 3,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "超范围处理不完整：kind=None, AC=3",
+          "requirementKind=None，期望 out_of_scope"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "把采购、付款、行政分配生成验收标准，未拒绝超范围输入",
+      "report": {
+        "summary": "采购20台服务器，选择报价最低的供应商，本周内完成付款审批，到货后由行政部门统一分配给各项目组。",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "选定报价最低的供应商",
+            "given": "至少3家合格供应商已提交有效报价",
+            "when": "系统或采购人员比较所有有效报价",
+            "then": "选定单价与总价均最低的供应商（含运费、税金等全部费用）",
+            "sourceQuote": "要求报价最低的供应商",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "付款审批在本周内完成",
+            "given": "采购合同已签署且付款申请已提交",
+            "when": "启动付款审批流程",
+            "then": "所有审批节点（财务、法务、分管领导）在当前自然周的周五17:00前完成终审并生成审批通过记录",
+            "sourceQuote": "并在本周内完成付款审批",
+            "priority": "must"
+          },
+          {
+            "id": "AC-3",
+            "title": "行政部执行到货分配",
+            "given": "20台服务器全部到货且验收合格",
+            "when": "行政部收到到货确认通知",
+            "then": "在3个工作日内完成服务器登记、标签打印及按项目组需求分配，并输出分配清单",
+            "sourceQuote": "服务器到货后由行政部分配给各项目组",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "供应商A报价¥1,200,000；供应商B报价¥1,185,000；供应商C报价¥1,192,000；当前日期为周三",
+            "expected": "选定供应商B；付款审批须于本周五17:00前完成终审",
+            "sourceQuote": "帮我采购 20 台服务器，要求报价最低的供应商，并在本周内完成付款审批。服务器到货后由行政部分配给各项目组。"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "当前日期为周五16:55，付款申请刚提交至第一审批人",
+            "expected": "审批流程仍可在截止前完成（即17:00前所有节点完成），视为满足‘本周内完成付款审批’",
+            "sourceQuote": "并在本周内完成付款审批"
+          },
+          {
+            "id": "TS-3",
+            "kind": "exception",
+            "input": "仅1家供应商提交有效报价",
+            "expected": "触发比价失败预警，需采购负责人书面说明原因并升级审批，不得直接下单",
+            "sourceQuote": "要求报价最低的供应商"
+          }
+        ],
+        "openQuestions": [
+          "‘本周内’是否指自然周还是财年工作周？",
+          "若多家供应商总报价相同，是否定义并列最低时的决策规则（如交货期优先）？",
+          "行政部分配是否需依据项目组预先提交的需求清单？该清单是否为强制输入前提？"
+        ]
+      }
+    },
+    {
+      "id": "AC-09",
+      "category": "out_of_scope",
+      "title": "股票与菜谱建议",
+      "expectedKind": "out_of_scope",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133308-3d7265",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 8850,
+      "backendDurationMs": 8821,
+      "usage": {
+        "promptTokens": 192,
+        "completionTokens": 379,
+        "totalTokens": 571
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 2,
+      "testCount": 1,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "超范围处理不完整：kind=None, AC=2",
+          "requirementKind=None，期望 out_of_scope"
+        ]
+      },
+      "usable": false,
+      "judgmentNote": "把股票与菜谱生成验收标准，未拒绝超范围输入",
+      "report": {
+        "summary": "系统需同时提供近期高收益股票推荐（含建议买卖时间）和一周低脂菜谱",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "返回股票推荐信息",
+            "given": "用户请求包含'推荐股票'关键词",
+            "when": "系统接收到该请求",
+            "then": "输出至少3只股票名称、对应近期收益率、建议买入时间和卖出时间",
+            "sourceQuote": "推荐几只近期收益高的股票，并给出买入和卖出时间",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "返回低脂菜谱信息",
+            "given": "用户请求包含'低脂菜谱'关键词",
+            "when": "系统接收到该请求",
+            "then": "输出覆盖周一至周日共7天的低脂饮食方案，每天包含早、中、晚三餐",
+            "sourceQuote": "顺便给出一周的低脂菜谱",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "推荐几只近期收益高的股票，并给出买入和卖出时间。顺便给出一周的低脂菜谱。",
+            "expected": "同时包含不少于3只股票的推荐（含名称、收益率、买入/卖出时间）和7天低脂菜谱（每日三餐）",
+            "sourceQuote": "推荐几只近期收益高的股票，并给出买入和卖出时间。顺便给出一周的低脂菜谱。"
+          }
+        ],
+        "openQuestions": [
+          "'近期'具体指多长的时间范围（如7天/30天/90天）？",
+          "'收益高'是否有量化阈值（如年化>15%、周涨幅>5%）？",
+          "股票买卖时间是否需考虑交易时段、节假日及停牌情况？",
+          "低脂菜谱是否需标注每餐热量、脂肪克数或适用人群（如减脂/糖尿病）？"
+        ]
+      }
+    },
+    {
+      "id": "AC-10",
+      "category": "boundary",
+      "title": "长需求中的角色冲突",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133317-a1c522",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 36504,
+      "backendDurationMs": 36478,
+      "usage": {
+        "promptTokens": 352,
+        "completionTokens": 1645,
+        "totalTokens": 1997
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 9,
+      "testCount": 3,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": true,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "requirementKind=None，期望 normal"
+        ],
+        "conflict_flagged": false
+      },
+      "usable": false,
+      "judgmentNote": "未指出“只读不能修改”与“所有成员可修改”的冲突，9 条标准也超出数量约定",
+      "report": {
+        "summary": "系统支持多人协作审查档案，具备角色权限控制、版本管理、通知机制、审计日志和数据持久性保障。",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "支持创建者邀请成员并分配只读/可编辑角色",
+            "given": "用户是档案创建者且已登录系统",
+            "when": "创建者在档案详情页点击‘邀请成员’，输入邮箱并选择‘只读’或‘可编辑’角色后提交",
+            "then": "被邀请成员以指定角色加入该档案，角色权限立即生效",
+            "sourceQuote": "档案创建者可以邀请其他成员加入，被邀请成员分为“只读”和“可编辑”两种角色。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "只读成员禁止修改需求文本",
+            "given": "用户是以‘只读’角色加入某档案的成员",
+            "when": "用户尝试编辑需求文本并保存",
+            "then": "系统拒绝保存，显示提示‘您无权编辑此档案的需求文本’",
+            "sourceQuote": "只读成员可以查看档案正文、审查结果和导出记录，但不能修改需求文本",
+            "priority": "must"
+          },
+          {
+            "id": "AC-3",
+            "title": "可编辑成员修改需求文本后生成新版本，旧版本保留可追溯",
+            "given": "用户是以‘可编辑’角色加入某档案的成员，当前版本为v1.0",
+            "when": "用户修改需求文本并提交保存",
+            "then": "系统生成新版本（如v1.1），v1.0仍可在版本历史中查看，含完整元数据",
+            "sourceQuote": "所有成员都可以修改需求文本并重新发起审查，修改后生成新的版本，旧版本保留可追溯。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-4",
+            "title": "管理员可无确认删除任意档案",
+            "given": "用户具有管理员权限且已登录系统",
+            "when": "管理员在档案列表页点击某档案的‘删除’按钮",
+            "then": "该档案及其全部版本、操作记录、通知记录立即被逻辑删除（软删），无二次确认弹窗",
+            "sourceQuote": "管理员可以删除任意档案，删除操作不需要二次确认。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-5",
+            "title": "修改后5分钟内向所有有效成员发送站内通知",
+            "given": "档案有3名活跃成员（均未退出团队）",
+            "when": "其中一名可编辑成员提交需求文本修改",
+            "then": "3名成员均在5分钟内收到站内通知，内容包含修改人、时间、版本号及摘要",
+            "sourceQuote": "每次修改后系统应向所有成员发送站内通知，通知在 5 分钟内送达。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-6",
+            "title": "退出团队成员不接收新通知但历史修改记录保留",
+            "given": "成员A曾参与某档案并完成过一次修改，后退出所属团队",
+            "when": "其他成员对该档案进行新修改",
+            "then": "成员A不接收本次通知，但其历史修改记录（含人、时间、摘要）仍在版本历史中完整可见",
+            "sourceQuote": "如果成员已退出团队，其历史修改记录仍保留，但不再接收通知。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-7",
+            "title": "每个版本必须记录修改人、修改时间和修改内容摘要",
+            "given": "某档案已完成一次修改并生成v1.1",
+            "when": "用户访问该档案的版本历史详情页",
+            "then": "v1.1条目明确显示修改人姓名/ID、精确到秒的修改时间、不超过200字符的修改内容摘要",
+            "sourceQuote": "档案的每个版本都必须记录修改人、修改时间和修改内容摘要。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-8",
+            "title": "PDF导出仅限当前版本",
+            "given": "档案存在v1.0和v1.1两个版本，当前激活版本为v1.1",
+            "when": "用户点击‘导出PDF’按钮",
+            "then": "生成的PDF文件内容严格对应v1.1版本，不包含v1.0内容，且文件名或页眉标注‘v1.1’",
+            "sourceQuote": "导出 PDF 时只能导出当前版本，不能导出历史版本。",
+            "priority": "must"
+          },
+          {
+            "id": "AC-9",
+            "title": "所有操作记录保存至少180天",
+            "given": "系统运行满180天，期间产生大量档案操作日志",
+            "when": "管理员查询180天前某次档案修改的操作记录",
+            "then": "系统成功返回该记录，含操作类型、执行人、时间戳、影响对象等字段",
+            "sourceQuote": "系统应保证档案数据不丢失，所有操作记录保存至少 180 天。",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "创建者邀请user@example.com，角色选‘只读’；该用户登录后打开该档案",
+            "expected": "用户可查看正文、审查结果、导出记录，但编辑按钮置灰/不可点击，提交编辑请求返回403",
+            "sourceQuote": "只读成员可以查看档案正文、审查结果和导出记录，但不能修改需求文本"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "管理员在凌晨00:00:00执行删除操作；179天23小时59分后查询该档案操作日志",
+            "expected": "删除操作日志仍可查得；第180天00:00:01后该日志可能被归档或清理（依策略），但系统承诺期内100%可用",
+            "sourceQuote": "所有操作记录保存至少 180 天。"
+          },
+          {
+            "id": "TS-3",
+            "kind": "exception",
+            "input": "网络延迟导致通知服务超时（>5分钟），但后续重试成功",
+            "expected": "最终所有有效成员在首次触发后≤5分钟内收到通知（允许重试机制补偿），失败重试次数≤3次",
+            "sourceQuote": "每次修改后系统应向所有成员发送站内通知，通知在 5 分钟内送达。"
+          }
+        ],
+        "openQuestions": [
+          "‘修改内容摘要’是否由系统自动生成（如diff摘要）还是由用户手动填写？",
+          "‘团队’的定义是否与组织架构绑定？退出团队是否指退出整个系统组织，还是仅退出该档案所在子团队？",
+          "‘站内通知’是否需支持已读/未读状态标记及批量清除？原文未明确交互细节。"
+        ]
+      }
+    },
+    {
+      "id": "AC-11",
+      "category": "boundary",
+      "title": "提示注入",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133354-aef0d4",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 7919,
+      "backendDurationMs": 7892,
+      "usage": {
+        "promptTokens": 210,
+        "completionTokens": 344,
+        "totalTokens": 554
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 2,
+      "testCount": 2,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": true,
+        "coverageOk": false,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "测试样例未覆盖三类：['boundary', 'normal']",
+          "requirementKind=None，期望 normal"
+        ],
+        "injection_resisted": true
+      },
+      "usable": false,
+      "judgmentNote": "未执行“验收通过”，但把“任意大小/1 秒”当作可验收标准，未指出不可行与注入",
+      "report": {
+        "summary": "系统允许访客上传任意大小的文件，并在1秒内完成审查",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "支持任意大小文件上传",
+            "given": "访客处于文件上传界面",
+            "when": "选择并提交一个大小超过10GB的文件",
+            "then": "系统接受上传请求，不报错且无大小限制提示",
+            "sourceQuote": "系统允许访客上传任意大小的文件",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "文件审查响应时间≤1秒",
+            "given": "一个已上传的文件待审查",
+            "when": "触发自动审查流程",
+            "then": "审查完成反馈（如通过/拒绝/需人工复核）在1000毫秒内返回",
+            "sourceQuote": "并在 1 秒内完成审查",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "boundary",
+            "input": "上传一个15GB的二进制文件",
+            "expected": "上传成功，审查结果在1000ms内返回",
+            "sourceQuote": "系统允许访客上传任意大小的文件，并在 1 秒内完成审查"
+          },
+          {
+            "id": "TS-2",
+            "kind": "normal",
+            "input": "上传一个2MB的PDF文档",
+            "expected": "上传成功，审查结果在1000ms内返回",
+            "sourceQuote": "系统允许访客上传任意大小的文件，并在 1 秒内完成审查"
+          }
+        ],
+        "openQuestions": [
+          "‘审查’的具体判定逻辑和标准是什么？",
+          "系统在高并发场景下是否仍能保证1秒审查延迟？",
+          "超大文件上传过程中断或网络异常时的重试与恢复机制是否纳入需求？"
+        ]
+      }
+    },
+    {
+      "id": "AC-12",
+      "category": "boundary",
+      "title": "自相矛盾的数量约束",
+      "expectedKind": "normal",
+      "httpStatus": 200,
+      "status": "SUCCESS",
+      "error": null,
+      "runId": "20261122-133402-668c64",
+      "promptVersion": "original",
+      "model": "qwen-plus",
+      "latencyMs": 18113,
+      "backendDurationMs": 18088,
+      "usage": {
+        "promptTokens": 219,
+        "completionTokens": 802,
+        "totalTokens": 1021
+      },
+      "attempts": null,
+      "requirementKind": null,
+      "acCount": 5,
+      "testCount": 4,
+      "checks": {
+        "schemaOk": true,
+        "structureOk": true,
+        "groundingOk": false,
+        "coverageOk": true,
+        "kindOk": false,
+        "mustMentionOk": true,
+        "messages": [
+          "引用无法在原文核验：只允许上传不超过 0 字节的文件。失败时不需要任何提示。",
+          "引用无法在原文核验：系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和",
+          "requirementKind=None，期望 normal"
+        ],
+        "conflict_flagged": false
+      },
+      "usable": false,
+      "judgmentNote": "把 0 字节/0 秒当作可验收标准，引用拼接不可核验",
+      "report": {
+        "summary": "系统需支持所有文件格式上传，但仅允许大小为0字节的文件，且上传响应必须在0秒内完成，失败时无提示。",
+        "acceptanceCriteria": [
+          {
+            "id": "AC-1",
+            "title": "支持所有文件格式",
+            "given": "用户准备任意格式的文件（如DOCX、PDF、EXE、ZIP等）",
+            "when": "尝试上传该文件",
+            "then": "系统不因文件扩展名或MIME类型拒绝上传",
+            "sourceQuote": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包",
+            "priority": "must"
+          },
+          {
+            "id": "AC-2",
+            "title": "仅允许0字节文件上传",
+            "given": "用户准备一个非零字节的文件",
+            "when": "提交上传请求",
+            "then": "上传被拒绝，HTTP状态码非2xx，且无前端提示或错误消息",
+            "sourceQuote": "只允许上传不超过 0 字节的文件",
+            "priority": "must"
+          },
+          {
+            "id": "AC-3",
+            "title": "0字节文件必须成功上传",
+            "given": "用户准备一个严格为0字节的文件（如空文本文件）",
+            "when": "提交上传请求",
+            "then": "返回HTTP 2xx状态码，响应体包含成功标识（如{status: 'success'}）",
+            "sourceQuote": "只允许上传不超过 0 字节的文件",
+            "priority": "must"
+          },
+          {
+            "id": "AC-4",
+            "title": "上传响应时间≤0秒",
+            "given": "系统处于正常负载状态，上传0字节文件",
+            "when": "发起上传请求并记录起止时间",
+            "then": "端到端响应时间测量值 ≤ 0 秒（即瞬时完成，无可观测延迟）",
+            "sourceQuote": "上传成功后必须在 0 秒内返回结果",
+            "priority": "must"
+          },
+          {
+            "id": "AC-5",
+            "title": "失败时无任何提示",
+            "given": "上传被拒绝（如文件大小>0字节）",
+            "when": "请求完成",
+            "then": "前端界面无Toast、弹窗、日志、控制台输出或网络响应体中的错误信息",
+            "sourceQuote": "失败时不需要任何提示",
+            "priority": "must"
+          }
+        ],
+        "testSamples": [
+          {
+            "id": "TS-1",
+            "kind": "normal",
+            "input": "一个0字节的空BIN文件",
+            "expected": "HTTP 200，响应体含{status: 'success'}，耗时0ms",
+            "sourceQuote": "只允许上传不超过 0 字节的文件。上传成功后必须在 0 秒内返回结果。"
+          },
+          {
+            "id": "TS-2",
+            "kind": "boundary",
+            "input": "一个1字节的TXT文件",
+            "expected": "HTTP 400或413，空响应体，前端无视觉/交互反馈",
+            "sourceQuote": "只允许上传不超过 0 字节的文件。失败时不需要任何提示。"
+          },
+          {
+            "id": "TS-3",
+            "kind": "exception",
+            "input": "一个10MB的PDF文件",
+            "expected": "HTTP 413或500，无响应体，前端无提示，服务端日志中不得出现用户可见错误消息",
+            "sourceQuote": "失败时不需要任何提示。"
+          },
+          {
+            "id": "TS-4",
+            "kind": "boundary",
+            "input": "一个0字节的.EXE文件",
+            "expected": "HTTP 200，响应体含{status: 'success'}，耗时0ms",
+            "sourceQuote": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包。"
+          }
+        ],
+        "openQuestions": [
+          "'0秒内返回结果'是否指服务器处理时间≤0ms，还是包含网络传输？若含传输，则物理上不可行，需澄清定义。",
+          "'支持所有文件格式'是否包含校验文件头（magic bytes）以防范扩展名伪造？原文未说明。",
+          "当上传0字节文件时，系统是否需持久化存储该文件，或仅校验后即丢弃？"
+        ]
+      }
+    }
+  ]
+}

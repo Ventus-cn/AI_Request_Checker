@@ -1,0 +1,51 @@
+{
+  "id": "AC-07",
+  "category": "insufficient",
+  "title": "只有一个功能名",
+  "expectedKind": "insufficient",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-134119-58ae95",
+  "promptVersion": "revised",
+  "model": "qwen-plus",
+  "latencyMs": 4663,
+  "backendDurationMs": 4634,
+  "usage": {
+    "promptTokens": 657,
+    "completionTokens": 198,
+    "totalTokens": 855
+  },
+  "attempts": 1,
+  "requirementKind": "insufficient",
+  "acCount": 0,
+  "testCount": 0,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": false,
+    "groundingOk": false,
+    "coverageOk": true,
+    "kindOk": true,
+    "mustMentionOk": true,
+    "messages": [
+      "存在 Given/When/Then 缺项",
+      "没有任何原文引用"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "requirementKind": "insufficient",
+    "summary": "需求仅提及'增加一个导出功能'，未说明导出对象、格式、触发方式、数据范围、权限控制、异常处理等关键要素，无法形成可验证的验收标准。",
+    "acceptanceCriteria": [],
+    "testSamples": [],
+    "openQuestions": [
+      "导出功能作用于哪类数据或页面？例如：用户列表、订单报表、还是某张特定表格？",
+      "导出文件应支持哪些格式？如 Excel（.xlsx）、CSV、PDF 等，是否需指定默认格式？",
+      "导出操作由谁触发？是否有权限限制（如仅管理员可用）？导出前是否需确认或二次验证？"
+    ],
+    "limits": [
+      "未提供任何可验证的行为描述、输入输出定义或约束条件；无法生成具体验收步骤或测试样例"
+    ]
+  }
+}

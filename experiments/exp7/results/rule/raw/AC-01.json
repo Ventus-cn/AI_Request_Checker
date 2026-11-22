@@ -1,0 +1,89 @@
+{
+  "id": "AC-01",
+  "category": "normal",
+  "title": "登录与角色权限",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133054-8d7728",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 113,
+  "backendDurationMs": 24,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 4,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": false,
+    "messages": [
+      "测试样例未覆盖三类：['normal']",
+      "requirementKind=None，期望 normal",
+      "缺少关键要点：['30']"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "系统应提供用户登录功能",
+        "sourceQuote": "系统应提供用户登录功能",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "用户在登录页输入用户名和密码，点击“登录”后，系统在 2 秒内返回结果",
+        "sourceQuote": "用户在登录页输入用户名和密码，点击“登录”后，系统在 2 秒内返回结果",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "需求语句 3",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "用户名或密码错误时，页面提示“用户名或密码错误”，连续失败 5 次后锁定账号 10 分钟",
+        "sourceQuote": "用户名或密码错误时，页面提示“用户名或密码错误”，连续失败 5 次后锁定账号 10 分钟",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "需求语句 4",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "管理员登录后可以查看全部审查档案，普通用户只能查看自己创建的档案",
+        "sourceQuote": "管理员登录后可以查看全部审查档案，普通用户只能查看自己创建的档案",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "系统应提供用户登录功能",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "系统应提供用户登录功能"
+      }
+    ],
+    "openQuestions": []
+  }
+}

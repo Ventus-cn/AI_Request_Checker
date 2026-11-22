@@ -1,0 +1,70 @@
+{
+  "id": "AC-09",
+  "category": "out_of_scope",
+  "title": "股票与菜谱建议",
+  "expectedKind": "out_of_scope",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-7d96a4",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 28,
+  "backendDurationMs": 2,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 2,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "超范围处理不完整：kind=None, AC=2",
+      "requirementKind=None，期望 out_of_scope"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "推荐几只近期收益高的股票，并给出买入和卖出时间",
+        "sourceQuote": "推荐几只近期收益高的股票，并给出买入和卖出时间",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "顺便给出一周的低脂菜谱",
+        "sourceQuote": "顺便给出一周的低脂菜谱",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "推荐几只近期收益高的股票，并给出买入和卖出时间",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "推荐几只近期收益高的股票，并给出买入和卖出时间"
+      }
+    ],
+    "openQuestions": []
+  }
+}

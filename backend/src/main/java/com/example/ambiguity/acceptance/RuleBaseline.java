@@ -41,9 +41,11 @@ public final class RuleBaseline {
         sentences.get(0)));
 
     return new Report(
+        "normal",
         "按句子模板生成的初版验收标准（无 AI 基线）",
         criteria,
         samples,
-        List.of());
+        List.of(),
+        List.of("无 AI 基线不判断需求是否充分，也不检查引用与覆盖"));
   }
 }

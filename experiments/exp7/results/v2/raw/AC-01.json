@@ -1,0 +1,112 @@
+{
+  "id": "AC-01",
+  "category": "normal",
+  "title": "登录与角色权限",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133936-8b28e4",
+  "promptVersion": "revised",
+  "model": "qwen-plus",
+  "latencyMs": 21265,
+  "backendDurationMs": 21196,
+  "usage": {
+    "promptTokens": 747,
+    "completionTokens": 947,
+    "totalTokens": 1694
+  },
+  "attempts": 1,
+  "requirementKind": "normal",
+  "acCount": 5,
+  "testCount": 3,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": true,
+    "kindOk": true,
+    "mustMentionOk": true,
+    "messages": []
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "requirementKind": "normal",
+    "summary": "需求完整描述了登录功能的输入、响应时间、错误提示、账号锁定策略、角色权限差异及会话超时机制，具备可验证性。",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "正常登录成功并维持会话",
+        "given": "用户已在登录页输入正确的用户名和密码",
+        "when": "点击“登录”按钮",
+        "then": "系统在2秒内跳转至主页面，且登录状态持续30分钟",
+        "sourceQuote": "系统应提供用户登录功能。用户在登录页输入用户名和密码，点击“登录”后，系统在 2 秒内返回结果。",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "用户名或密码错误时给出明确提示",
+        "given": "用户在登录页输入错误的用户名或错误的密码",
+        "when": "点击“登录”按钮",
+        "then": "页面显示提示文字“用户名或密码错误”，且不跳转",
+        "sourceQuote": "用户名或密码错误时，页面提示“用户名或密码错误”",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "连续5次失败后账号被锁定10分钟",
+        "given": "同一用户名连续5次登录失败（每次均触发‘用户名或密码错误’提示）",
+        "when": "第6次尝试使用该用户名登录（无论密码是否正确）",
+        "then": "页面提示账号已被锁定，且系统拒绝认证请求，10分钟内无法再次尝试登录",
+        "sourceQuote": "连续失败 5 次后锁定账号 10 分钟",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "角色权限控制：管理员可查看全部审查档案",
+        "given": "管理员已成功登录且会话有效",
+        "when": "访问审查档案列表页面",
+        "then": "页面加载并展示系统中所有审查档案（含其他用户创建的）",
+        "sourceQuote": "管理员登录后可以查看全部审查档案",
+        "priority": "must"
+      },
+      {
+        "id": "AC-5",
+        "title": "角色权限控制：普通用户仅能查看自己创建的档案",
+        "given": "普通用户已成功登录且会话有效",
+        "when": "访问审查档案列表页面",
+        "then": "页面仅加载并展示该用户本人创建的审查档案，不包含他人创建的记录",
+        "sourceQuote": "普通用户只能查看自己创建的档案",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "用户名='admin'，密码='123456'",
+        "expected": "登录成功，跳转至主页面，会话有效期为30分钟",
+        "sourceQuote": "系统应提供用户登录功能。用户在登录页输入用户名和密码，点击“登录”后，系统在 2 秒内返回结果。"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "同一用户名第5次输入错误密码",
+        "expected": "仍显示‘用户名或密码错误’，账号尚未锁定",
+        "sourceQuote": "连续失败 5 次后锁定账号 10 分钟"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "同一用户名第6次登录（前5次均失败）",
+        "expected": "页面提示账号已被锁定，认证被拒绝",
+        "sourceQuote": "连续失败 5 次后锁定账号 10 分钟"
+      }
+    ],
+    "openQuestions": [],
+    "limits": [
+      "未定义‘用户名’和‘密码’的具体格式约束（如长度、字符集）；未说明账号锁定是否区分大小写或是否支持解锁操作；未明确‘审查档案’的数据结构及列表接口行为；未指定登录超时后的具体跳转目标或提示方式"
+    ]
+  }
+}

@@ -31,14 +31,18 @@ public class AcceptanceModelClient {
   }
 
   public ChatResult chat(String system, String user) {
+    return chat(List.of(
+        Map.of("role", "system", "content", system),
+        Map.of("role", "user", "content", user)));
+  }
+
+  public ChatResult chat(List<Map<String, String>> messages) {
     if (apiKey == null || apiKey.isBlank()) throw new IllegalStateException("未配置 DASHSCOPE_API_KEY，无法调用模型");
     Map<String, Object> payload = Map.of(
         "model", props.getModel(),
         "temperature", props.getTemperature(),
         "max_tokens", props.getMaxTokens(),
-        "messages", List.of(
-            Map.of("role", "system", "content", system),
-            Map.of("role", "user", "content", user)));
+        "messages", messages);
     long started = System.currentTimeMillis();
     try {
       String body = client.post().uri(url)

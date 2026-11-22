@@ -1,0 +1,75 @@
+{
+  "id": "AC-09",
+  "category": "out_of_scope",
+  "title": "股票与菜谱建议",
+  "expectedKind": "out_of_scope",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133308-3d7265",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 8850,
+  "backendDurationMs": 8821,
+  "usage": {
+    "promptTokens": 192,
+    "completionTokens": 379,
+    "totalTokens": 571
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 2,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "超范围处理不完整：kind=None, AC=2",
+      "requirementKind=None，期望 out_of_scope"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "系统需同时提供近期高收益股票推荐（含建议买卖时间）和一周低脂菜谱",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "返回股票推荐信息",
+        "given": "用户请求包含'推荐股票'关键词",
+        "when": "系统接收到该请求",
+        "then": "输出至少3只股票名称、对应近期收益率、建议买入时间和卖出时间",
+        "sourceQuote": "推荐几只近期收益高的股票，并给出买入和卖出时间",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "返回低脂菜谱信息",
+        "given": "用户请求包含'低脂菜谱'关键词",
+        "when": "系统接收到该请求",
+        "then": "输出覆盖周一至周日共7天的低脂饮食方案，每天包含早、中、晚三餐",
+        "sourceQuote": "顺便给出一周的低脂菜谱",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "推荐几只近期收益高的股票，并给出买入和卖出时间。顺便给出一周的低脂菜谱。",
+        "expected": "同时包含不少于3只股票的推荐（含名称、收益率、买入/卖出时间）和7天低脂菜谱（每日三餐）",
+        "sourceQuote": "推荐几只近期收益高的股票，并给出买入和卖出时间。顺便给出一周的低脂菜谱。"
+      }
+    ],
+    "openQuestions": [
+      "'近期'具体指多长的时间范围（如7天/30天/90天）？",
+      "'收益高'是否有量化阈值（如年化>15%、周涨幅>5%）？",
+      "股票买卖时间是否需考虑交易时段、节假日及停牌情况？",
+      "低脂菜谱是否需标注每餐热量、脂肪克数或适用人群（如减脂/糖尿病）？"
+    ]
+  }
+}

@@ -1,0 +1,5 @@
+{"runId":"20261122-134124-a9baf2","ts":"2026-11-22T13:41:24.559039600+08:00","attempt":0,"phase":"context","model":"qwen-plus","inputPreview":"系统需要支持审查档案的多人协作。档案创建者可以邀请其他成员加入，被邀请成员分为“只读”和“可编辑”两种角色。只读成员可以查看档案正文、审查结果和导出记录，但不能…","mode":"model","inputChars":296,"version":"revised"}
+{"runId":"20261122-134124-a9baf2","ts":"2026-11-22T13:41:24.561034100+08:00","attempt":1,"phase":"model","messages":2,"status":"start","promptVersion":"revised"}
+{"runId":"20261122-134124-a9baf2","ts":"2026-11-22T13:41:56.653241800+08:00","attempt":1,"phase":"model","completionTokens":1442,"status":"ok","durationMs":32091,"promptTokens":834}
+{"runId":"20261122-134124-a9baf2","ts":"2026-11-22T13:41:56.658249600+08:00","attempt":1,"phase":"check","groundingOk":true,"structureOk":true,"coverageOk":true,"schemaOk":true,"status":"ok","messages":""}
+{"runId":"20261122-134124-a9baf2","ts":"2026-11-22T13:41:56.660245100+08:00","attempt":1,"phase":"finish","status":"SUCCESS","durationMs":32091}

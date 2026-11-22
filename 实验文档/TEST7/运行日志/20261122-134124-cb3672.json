@@ -1,0 +1,28 @@
+{
+  "runId" : "20261122-134124-cb3672",
+  "promptVersion" : "revised",
+  "mode" : "model",
+  "model" : "qwen-plus",
+  "durationMs" : 2,
+  "promptTokens" : 0,
+  "completionTokens" : 0,
+  "attempts" : 0,
+  "inputChars" : 54,
+  "input" : "帮我采购 20 台服务器，要求报价最低的供应商，并在本周内完成付款审批。服务器到货后由行政部分配给各项目组。",
+  "report" : {
+    "requirementKind" : "out_of_scope",
+    "summary" : "当前输入不是软件需求，已拒绝生成验收标准。",
+    "acceptanceCriteria" : [ ],
+    "testSamples" : [ ],
+    "openQuestions" : [ "请提交软件功能需求原文（角色、输入、输出、边界与验收口径）。", "如需审查采购、付款、股票等非软件事项，请使用对应业务系统或人工流程。" ],
+    "limits" : [ "程序在调用模型前按范围规则拒绝，未产生费用。" ]
+  },
+  "checks" : {
+    "schemaOk" : true,
+    "groundingOk" : true,
+    "structureOk" : true,
+    "coverageOk" : true,
+    "messages" : [ "程序判定为超出范围，未调用模型" ]
+  },
+  "rawAttempts" : [ ]
+}

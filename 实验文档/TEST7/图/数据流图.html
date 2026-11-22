@@ -1,0 +1,56 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;color:#1e2637;font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:34px 40px 28px}
+h1{font-size:21px;letter-spacing:.5px;margin-bottom:4px}
+.sub{font-size:11px;color:#66708a;margin-bottom:24px}
+.canvas{width:1220px}
+.flow{display:flex;flex-direction:column;align-items:center;gap:0}
+.row{display:flex;align-items:stretch;gap:14px;justify-content:center;width:100%}
+.node{background:#f4f7fd;border:1px solid #c9d4ea;border-left:4px solid #4f7fd8;border-radius:8px;padding:10px 14px;min-width:250px}
+.node b{display:block;font-size:13px;margin-bottom:4px}
+.node span{display:block;font-size:10.5px;line-height:1.65;color:#556079}
+.node.model{border-left-color:#8b5cf6;background:#f7f3ff;border-color:#d8cbf2}
+.node.check{border-left-color:#d79a2b;background:#fffaef;border-color:#ecd9b3}
+.node.ok{border-left-color:#2e9e74;background:#f0fbf6;border-color:#bfe6d7}
+.node.fail{border-left-color:#d05a6a;background:#fdf2f4;border-color:#efc7ce}
+.node.store{border-left-color:#2f7fb8;background:#f1f8fd;border-color:#c2dfef}
+.arrow{height:26px;display:grid;place-items:center;color:#8a96ad;font-size:15px;line-height:1}
+.branch{display:grid;grid-template-columns:1fr 1fr;gap:26px;width:100%;margin-top:8px}
+.branch .col{display:flex;flex-direction:column;gap:10px}
+.branch .title{font-size:10px;color:#7a8499;letter-spacing:.5px;text-align:center}
+.side{border:1.5px dashed #b4a6e0;background:#faf8ff;border-radius:8px;padding:10px 14px;margin-top:22px;color:#5b4a8a}
+.side b{font-size:11.5px}
+.side span{display:block;font-size:10px;line-height:1.7;margin-top:3px;color:#6d6390}
+.legend{display:flex;gap:22px;margin-top:18px;font-size:10px;color:#66708a;border-top:1px solid #e2e8f2;padding-top:12px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
+.two{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start}
+</style></head><body><div class="canvas">
+<h1>验收标准生成原型：数据流与端到端链路</h1>
+<div class="sub">输入 → 预处理 → 模型 → 解析与程序检查 → 展示/保存；虚线框为后续接入基础软件的位置</div>
+<div class="two">
+<div class="flow">
+  <div class="row"><div class="node input"><b>① 用户输入</b><span>需求原文（≤3000 字），来源：页面粘贴或测试集；拒绝空输入与超长输入</span></div></div>
+  <div class="arrow">↓</div>
+  <div class="row"><div class="node"><b>② 预处理</b><span>空白规范化、长度校验、非软件需求范围预判（采购/付款/股票等）；规则命中直接拒绝，不调用模型</span></div></div>
+  <div class="arrow">↓</div>
+  <div class="row"><div class="node model"><b>③ 模型调用 · qwen-plus</b><span>system Prompt（v1 初版 / v2 修订版）+ 需求原文；v2 修复轮次追加上一版输出与检查错误</span></div></div>
+  <div class="arrow">↓</div>
+  <div class="row"><div class="node"><b>④ 解析与字段映射</b><span>去除代码围栏、截取 JSON、映射 requirementKind / 验收标准 / 测试样例 / 待确认问题</span></div></div>
+  <div class="arrow">↓</div>
+  <div class="row"><div class="node check"><b>⑤ 程序检查（v2）</b><span>结构合法 · 原文引用逐字核验 · Given/When/Then 完整 · 正常/边界/异常覆盖 · 类型判定</span></div></div>
+  <div class="branch">
+    <div class="col"><div class="title">检查通过</div><div class="node ok"><b>⑥ 展示与保存</b><span>页面展示验收标准 / 测试样例 / 待确认问题；写入 runs/&lt;runId&gt;.jsonl 与 .json</span></div></div>
+    <div class="col"><div class="title">检查不通过且尝试 &lt; 3</div><div class="node fail"><b>⑥′ 有限修复</b><span>把检查错误作为反馈追加到上下文，要求模型重写；连续失败返回 CHECK_FAILED</span></div></div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="row"><div class="node store"><b>⑦ 评测与对比</b><span>同一测试集（12 例）分别运行 基线 / 初版 / 修订版，记录输出、检查、耗时与 Token</span></div></div>
+</div>
+<div>
+  <div class="side"><b>准备与基础软件连接的位置</b><span>① 从「审查档案」选择已保存的需求，作为输入来源；<br>② 生成结果回写为档案的一个版本，或作为验收标准字段参与报告导出；<br>③ 当前实验不要求完成集成，接口已按 REST 设计（POST /api/acceptance/runs）。</span></div>
+  <div class="side" style="border-color:#c9d4ea;background:#f8fafd;color:#4b5a76"><b>集中配置</b><span>模型名、温度、max_tokens、超时、最大尝试次数、日志目录集中在 application.yml 的 app.acceptance；两版 Prompt 分别放在 resources/acceptance/prompt-initial.txt 与 prompt-revised.txt；API Key 只从环境变量读取。</span></div>
+  <div class="side" style="border-color:#ecd9b3;background:#fffdf7;color:#7a5a1f"><b>无 AI 基线</b><span>按中文句号切句，套用固定模板生成 1 条测试样例；不判断信息是否充分，不做引用与覆盖检查，用于说明“有/无程序校验”的差异。</span></div>
+</div>
+</div>
+<div class="legend"><span><i style="background:#4f7fd8"></i>业务步骤</span><span><i style="background:#8b5cf6"></i>模型调用</span><span><i style="background:#d79a2b"></i>程序检查</span><span><i style="background:#2e9e74"></i>通过分支</span><span><i style="background:#d05a6a"></i>修复分支</span></div>
+</div></body></html>

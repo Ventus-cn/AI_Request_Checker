@@ -10,25 +10,33 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Pattern;
 
-/** 端到端主链路：输入规范化 → 模型调用 → JSON 解析 → 结果返回。 */
+/**
+ * 端到端主链路：输入规范化 → 需求类型判定 → 模型调用 → 解析 → 程序检查 → 有限修复 → 返回。
+ * revised 版本启用程序检查与修复；original 版本保留 v1 的单次调用行为，便于同测试集复现。
+ */
 @Service
 public class AcceptanceService {
   private static final DateTimeFormatter ID_TIME = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
   private static final SecureRandom RANDOM = new SecureRandom();
+  private static final Pattern OUT_OF_SCOPE = Pattern.compile("(采购|报价|供应商|付款|审批|股票|基金|菜谱|旅游|医疗诊断|诉讼)");
 
   private final AcceptanceModelClient modelClient;
   private final AcceptancePrompts prompts;
   private final AcceptanceProperties props;
   private final AcceptanceRunLogger logger;
+  private final AcceptanceChecker checker;
   private final ObjectMapper mapper = new ObjectMapper();
 
   public AcceptanceService(AcceptanceModelClient modelClient, AcceptancePrompts prompts,
-                           AcceptanceProperties props, AcceptanceRunLogger logger) {
+                           AcceptanceProperties props, AcceptanceRunLogger logger,
+                           AcceptanceChecker checker) {
     this.modelClient = modelClient;
     this.prompts = prompts;
     this.props = props;
     this.logger = logger;
+    this.checker = checker;
   }
 
   public RunResponse run(RunRequest request) {
@@ -50,62 +58,190 @@ public class AcceptanceService {
     if (rule) {
       Report report = RuleBaseline.build(text);
       long duration = System.currentTimeMillis() - started;
-      logger.event(runId, 0, "finish", Map.of("status", "SUCCESS", "durationMs", duration, "criteria", report.acceptanceCriteria().size()));
-      logger.artifact(runId, artifact(runId, version, "rule", text, null, report, duration, 0, 0));
+      logger.event(runId, 0, "finish", Map.of("status", "SUCCESS", "durationMs", duration,
+          "criteria", report.acceptanceCriteria().size()));
+      logger.artifact(runId, artifact(runId, version, "rule", text, List.of(), report, null, 1, duration, 0, 0));
       return new RunResponse(runId, "SUCCESS", version, "rule-baseline", duration,
-          new Usage(0, 0, 0), report, null);
+          new Usage(0, 0, 0), report, null, 1, null);
     }
 
+    if ("original".equals(version)) return singleCall(runId, text, version, started);
+    return revisedRun(runId, text, version, started);
+  }
+
+  /** v1 行为：单次模型调用、只解析 JSON，不做程序检查与修复。 */
+  private RunResponse singleCall(String runId, String text, String version, long started) {
     String system = prompts.load(version);
-    String user = "需求原文：\n" + text;
+    List<Map<String, String>> messages = new ArrayList<>();
+    messages.add(Map.of("role", "system", "content", system));
+    messages.add(Map.of("role", "user", "content", "需求原文：\n" + text));
     logger.event(runId, 1, "model", Map.of("status", "start", "promptVersion", version));
 
-    String raw;
     AcceptanceModelClient.ChatResult result;
     try {
-      result = modelClient.chat(system, user);
+      result = modelClient.chat(messages);
     } catch (Exception e) {
-      long duration = System.currentTimeMillis() - started;
-      String message = rootMessage(e);
-      logger.event(runId, 1, "model", Map.of("status", "error", "errorType", "MODEL_ERROR", "message", preview(message, 200)));
-      logger.event(runId, 1, "finish", Map.of("status", "FAILED", "durationMs", duration));
-      logger.artifact(runId, artifact(runId, version, "model", text, null, null, duration, 0, 0));
-      return new RunResponse(runId, "FAILED", version, props.getModel(), duration,
-          new Usage(0, 0, 0), null, "模型调用失败：" + message);
+      return failed(runId, text, version, started, 1, "模型调用失败：" + rootMessage(e), List.of());
     }
-
-    raw = result.content();
-    long duration = result.durationMs() > 0 ? result.durationMs() : System.currentTimeMillis() - started;
-    logger.event(runId, 1, "model", Map.of("status", "ok", "durationMs", duration,
-        "promptTokens", result.promptTokens(), "completionTokens", result.completionTokens()));
-
     Report report;
     try {
-      report = parseReport(raw);
+      report = parseReport(result.content());
     } catch (Exception e) {
       String message = "输出不是合法 JSON：" + rootMessage(e);
       logger.event(runId, 1, "parse", Map.of("status", "error", "errorType", "PARSE_ERROR", "message", preview(message, 200)));
-      logger.event(runId, 1, "finish", Map.of("status", "FAILED", "durationMs", duration));
-      logger.artifact(runId, artifact(runId, version, "model", text, raw, null, duration,
-          result.promptTokens(), result.completionTokens()));
-      return new RunResponse(runId, "FAILED", version, props.getModel(), duration,
-          new Usage(result.promptTokens(), result.completionTokens(),
-              result.promptTokens() + result.completionTokens()), null, message);
+      return failed(runId, text, version, started, 1, message,
+          List.of(new Attempt(1, result.content(), null)));
     }
-
+    long duration = result.durationMs() > 0 ? result.durationMs() : System.currentTimeMillis() - started;
     logger.event(runId, 1, "parse", Map.of("status", "ok",
         "criteria", report.acceptanceCriteria().size(), "testSamples", report.testSamples().size()));
     logger.event(runId, 1, "finish", Map.of("status", "SUCCESS", "durationMs", duration));
-    logger.artifact(runId, artifact(runId, version, "model", text, raw, report, duration,
+    logger.artifact(runId, artifact(runId, version, "model", text,
+        List.of(new Attempt(1, result.content(), null)), report, null, 1, duration,
         result.promptTokens(), result.completionTokens()));
-
     return new RunResponse(runId, "SUCCESS", version, props.getModel(), duration,
         new Usage(result.promptTokens(), result.completionTokens(),
-            result.promptTokens() + result.completionTokens()), report, null);
+            result.promptTokens() + result.completionTokens()), report, null, 1, null);
   }
 
-  private Map<String, Object> artifact(String runId, String version, String mode, String text, String raw,
-                                       Report report, long durationMs, int promptTokens, int completionTokens) {
+  /** v2 修订版：范围预检 + 模型调用 + 程序检查 + 有限修复。 */
+  private RunResponse revisedRun(String runId, String text, String version, long started) {
+    if (OUT_OF_SCOPE.matcher(text).find()) {
+      Report report = new Report("out_of_scope",
+          "当前输入不是软件需求，已拒绝生成验收标准。",
+          List.of(), List.of(),
+          List.of("请提交软件功能需求原文（角色、输入、输出、边界与验收口径）。",
+              "如需审查采购、付款、股票等非软件事项，请使用对应业务系统或人工流程。"),
+          List.of("程序在调用模型前按范围规则拒绝，未产生费用。"));
+      Checks checks = new Checks(true, true, true, true, List.of("程序判定为超出范围，未调用模型"));
+      long duration = System.currentTimeMillis() - started;
+      logger.event(runId, 0, "check", Map.of("status", "ok", "result", "OUT_OF_SCOPE"));
+      logger.event(runId, 0, "finish", Map.of("status", "REFUSED", "durationMs", duration));
+      logger.artifact(runId, artifact(runId, version, "model", text, List.of(), report, checks, 0, duration, 0, 0));
+      return new RunResponse(runId, "REFUSED", version, props.getModel(), duration,
+          new Usage(0, 0, 0), report, checks, 0, null);
+    }
+
+    String system = prompts.load(version);
+    List<Map<String, String>> messages = new ArrayList<>();
+    messages.add(Map.of("role", "system", "content", system));
+    messages.add(Map.of("role", "user", "content", "需求原文：\n" + text));
+
+    List<Attempt> attempts = new ArrayList<>();
+    int promptTokens = 0;
+    int completionTokens = 0;
+    long totalMs = 0;
+    Report report = null;
+    Checks checks = null;
+    String lastError = null;
+
+    for (int attempt = 1; attempt <= props.getMaxAttempts(); attempt++) {
+      logger.event(runId, attempt, "model", Map.of("status", "start", "promptVersion", version,
+          "messages", messages.size()));
+      AcceptanceModelClient.ChatResult result;
+      try {
+        result = modelClient.chat(messages);
+      } catch (Exception e) {
+        lastError = "模型调用失败：" + rootMessage(e);
+        logger.event(runId, attempt, "model", Map.of("status", "error",
+            "errorType", "MODEL_ERROR", "message", preview(lastError, 200)));
+        return failedWith(runId, text, version, started, attempt, attempts, lastError,
+            promptTokens, completionTokens, totalMs);
+      }
+      promptTokens += result.promptTokens();
+      completionTokens += result.completionTokens();
+      totalMs += result.durationMs();
+      logger.event(runId, attempt, "model", Map.of("status", "ok",
+          "durationMs", result.durationMs(), "promptTokens", result.promptTokens(),
+          "completionTokens", result.completionTokens()));
+
+      try {
+        report = parseReport(result.content());
+      } catch (Exception e) {
+        lastError = "输出不是合法 JSON：" + rootMessage(e);
+        attempts.add(new Attempt(attempt, result.content(), null));
+        logger.event(runId, attempt, "parse", Map.of("status", "error",
+            "errorType", "PARSE_ERROR", "message", preview(lastError, 160)));
+        if (attempt < props.getMaxAttempts()) {
+          messages.add(Map.of("role", "assistant", "content", truncate(result.content(), 6000)));
+          messages.add(Map.of("role", "user", "content",
+              "上一版输出无法解析为 JSON：" + rootMessage(e)
+                  + "。请只输出一个合法的 JSON 对象，字段与结构必须完全符合系统要求。"));
+          logger.event(runId, attempt, "repair", Map.of("status", "start", "reason", "PARSE_ERROR"));
+          continue;
+        }
+        return failedWith(runId, text, version, started, attempt, attempts, lastError,
+            promptTokens, completionTokens, totalMs);
+      }
+
+      checks = checker.check(text, report);
+      attempts.add(new Attempt(attempt, result.content(), checks));
+      logger.event(runId, attempt, "check", Map.of("status", checks.acceptable() ? "ok" : "error",
+          "schemaOk", checks.schemaOk(), "groundingOk", checks.groundingOk(),
+          "structureOk", checks.structureOk(), "coverageOk", checks.coverageOk(),
+          "messages", String.join("；", checks.messages())));
+
+      if (checks.acceptable()) {
+        long duration = totalMs > 0 ? totalMs : System.currentTimeMillis() - started;
+        logger.event(runId, attempt, "finish", Map.of("status", "SUCCESS", "durationMs", duration));
+        logger.artifact(runId, artifact(runId, version, "model", text, attempts, report, checks,
+            attempt, duration, promptTokens, completionTokens));
+        return new RunResponse(runId, "SUCCESS", version, props.getModel(), duration,
+            new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
+            report, checks, attempt, null);
+      }
+
+      if (attempt < props.getMaxAttempts()) {
+        messages.add(Map.of("role", "assistant", "content", truncate(result.content(), 6000)));
+        messages.add(Map.of("role", "user", "content", repairInstruction(checks.messages())));
+        logger.event(runId, attempt, "repair", Map.of("status", "start",
+            "reason", preview(String.join("；", checks.messages()), 200)));
+        lastError = String.join("；", checks.messages());
+      }
+    }
+
+    long duration = totalMs > 0 ? totalMs : System.currentTimeMillis() - started;
+    logger.event(runId, props.getMaxAttempts(), "finish", Map.of("status", "CHECK_FAILED", "durationMs", duration));
+    logger.artifact(runId, artifact(runId, version, "model", text, attempts, report, checks,
+        props.getMaxAttempts(), duration, promptTokens, completionTokens));
+    return new RunResponse(runId, "CHECK_FAILED", version, props.getModel(), duration,
+        new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
+        report, checks, props.getMaxAttempts(),
+        "结果未通过程序检查：" + (lastError == null ? "未知原因" : lastError));
+  }
+
+  private String repairInstruction(List<String> messages) {
+    return "上一版输出未通过程序检查：" + String.join("；", messages)
+        + "。请重写完整 JSON，逐条修正上述问题：requirementKind 必须正确；引用必须逐字来自原文；"
+        + "正常需求的每条验收标准必须包含 Given/When/Then；测试样例必须同时覆盖 normal、boundary、exception；"
+        + "信息不足或超出范围时不要生成验收标准。只输出 JSON。";
+  }
+
+  private RunResponse failed(String runId, String text, String version, long started,
+                             int attempts, String message, List<Attempt> attemptList) {
+    long duration = System.currentTimeMillis() - started;
+    logger.event(runId, attempts, "finish", Map.of("status", "FAILED", "durationMs", duration));
+    logger.artifact(runId, artifact(runId, version, "model", text, attemptList, null, null,
+        attempts, duration, 0, 0));
+    return new RunResponse(runId, "FAILED", version, props.getModel(), duration,
+        new Usage(0, 0, 0), null, null, attempts, message);
+  }
+
+  private RunResponse failedWith(String runId, String text, String version, long started, int attempts,
+                                 List<Attempt> attemptList, String message,
+                                 int promptTokens, int completionTokens, long totalMs) {
+    long duration = totalMs > 0 ? totalMs : System.currentTimeMillis() - started;
+    logger.event(runId, attempts, "finish", Map.of("status", "FAILED", "durationMs", duration));
+    logger.artifact(runId, artifact(runId, version, "model", text, attemptList, null, null,
+        attempts, duration, promptTokens, completionTokens));
+    return new RunResponse(runId, "FAILED", version, props.getModel(), duration,
+        new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
+        null, null, attempts, message);
+  }
+
+  private Map<String, Object> artifact(String runId, String version, String mode, String text,
+                                       List<Attempt> attempts, Report report, Checks checks,
+                                       int attemptCount, long durationMs, int promptTokens, int completionTokens) {
     Map<String, Object> data = new LinkedHashMap<>();
     data.put("runId", runId);
     data.put("promptVersion", version);
@@ -114,10 +250,20 @@ public class AcceptanceService {
     data.put("durationMs", durationMs);
     data.put("promptTokens", promptTokens);
     data.put("completionTokens", completionTokens);
+    data.put("attempts", attemptCount);
     data.put("inputChars", text.length());
     data.put("input", text);
-    data.put("rawOutput", raw == null ? null : preview(raw, 8000));
     data.put("report", report);
+    data.put("checks", checks);
+    List<Map<String, Object>> rawAttempts = new ArrayList<>();
+    for (Attempt attempt : attempts) {
+      Map<String, Object> row = new LinkedHashMap<>();
+      row.put("attempt", attempt.number());
+      row.put("rawOutput", preview(attempt.raw(), 8000));
+      row.put("checks", attempt.checks());
+      rawAttempts.add(row);
+    }
+    data.put("rawAttempts", rawAttempts);
     return data;
   }
 
@@ -136,7 +282,10 @@ public class AcceptanceService {
     }
     List<String> questions = new ArrayList<>();
     for (JsonNode node : array(root, "openQuestions")) questions.add(node.asText(""));
-    return new Report(text(root, "summary"), criteria, samples, questions);
+    List<String> limits = new ArrayList<>();
+    for (JsonNode node : array(root, "limits")) limits.add(node.asText(""));
+    return new Report(text(root, "requirementKind"), text(root, "summary"),
+        criteria, samples, questions, limits);
   }
 
   private List<JsonNode> array(JsonNode root, String field) {
@@ -148,7 +297,9 @@ public class AcceptanceService {
 
   private String text(JsonNode node, String field) {
     JsonNode value = node.path(field);
-    return value.isMissingNode() || value.isNull() ? "" : value.asText("");
+    if (value.isMissingNode() || value.isNull()) return "";
+    if (value.isContainerNode()) return value.toString();
+    return value.asText("");
   }
 
   private String extractJson(String raw) {
@@ -178,9 +329,16 @@ public class AcceptanceService {
     return flat.length() <= limit ? flat : flat.substring(0, limit) + "…";
   }
 
+  private String truncate(String value, int limit) {
+    if (value == null) return "";
+    return value.length() <= limit ? value : value.substring(0, limit);
+  }
+
   private String hex(int length) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < length; i++) sb.append("0123456789abcdef".charAt(RANDOM.nextInt(16)));
     return sb.toString();
   }
+
+  private record Attempt(int number, String raw, Checks checks) {}
 }

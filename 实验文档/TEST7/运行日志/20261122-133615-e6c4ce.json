@@ -1,0 +1,108 @@
+{
+  "runId" : "20261122-133615-e6c4ce",
+  "promptVersion" : "revised",
+  "mode" : "model",
+  "model" : "qwen-plus",
+  "durationMs" : 77800,
+  "promptTokens" : 5928,
+  "completionTokens" : 3451,
+  "attempts" : 3,
+  "inputChars" : 138,
+  "input" : "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。",
+  "report" : {
+    "requirementKind" : "normal",
+    "summary" : "需求明确指定了支持的文件格式（DOCX/PDF）、大小上限（10MB）、解析内容（正文和内嵌图片）、性能约束（≤60秒）、错误反馈要求（具体提示并拒绝上传）、以及扫描版PDF的特殊处理（调用视觉模型、标注未识别范围）。",
+    "acceptanceCriteria" : [ {
+      "id" : "AC-1",
+      "title" : "支持上传DOCX或PDF格式且≤10MB的文件并成功解析",
+      "given" : "用户处于文档上传页面，本地存在一个大小为9.8MB的合法DOCX文件",
+      "when" : "用户选择该文件并点击上传按钮",
+      "then" : "系统在60秒内完成解析，返回包含正文文本和提取出的内嵌图片的结构化结果",
+      "sourceQuote" : "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。",
+      "priority" : "must"
+    }, {
+      "id" : "AC-2",
+      "title" : "上传超过10MB的文件时，页面显示具体错误原因并拒绝上传",
+      "given" : "用户处于文档上传页面，本地存在一个大小为10.2MB的PDF文件",
+      "when" : "用户选择该文件并点击上传按钮",
+      "then" : "页面立即显示提示消息'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且不发起解析请求",
+      "sourceQuote" : "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。",
+      "priority" : "must"
+    }, {
+      "id" : "AC-3",
+      "title" : "上传非DOCX/PDF格式文件时，页面显示具体错误原因并拒绝上传",
+      "given" : "用户处于文档上传页面，本地存在一个PNG格式图像文件",
+      "when" : "用户选择该PNG文件并点击上传按钮",
+      "then" : "页面立即显示提示消息'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且不发起解析请求",
+      "sourceQuote" : "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。",
+      "priority" : "must"
+    }, {
+      "id" : "AC-4",
+      "title" : "扫描版PDF中识别失败的页面需在解析结果中标注未识别范围",
+      "given" : "用户上传一个含3页的扫描版PDF，其中第2页因模糊度过高导致视觉模型识别失败",
+      "when" : "系统完成解析（含调用视觉模型）",
+      "then" : "返回的解析结果中，第2页的内容字段标记为'未识别'，并附带region字段描述该页全页范围（如[0,0,595,842]）",
+      "sourceQuote" : "扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。",
+      "priority" : "must"
+    } ],
+    "testSamples" : [ {
+      "id" : "TS-1",
+      "kind" : "normal",
+      "input" : "",
+      "expected" : "系统在60秒内返回包含完整正文文本和所有内嵌图片的解析结果",
+      "sourceQuote" : "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。"
+    }, {
+      "id" : "TS-2",
+      "kind" : "boundary",
+      "input" : "",
+      "expected" : "页面提示'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且未触发后端解析",
+      "sourceQuote" : "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。"
+    }, {
+      "id" : "TS-3",
+      "kind" : "exception",
+      "input" : "",
+      "expected" : "解析结果中第1页的content字段值为字符串'未识别'，且包含region字段（如region=[0,0,595,842]）",
+      "sourceQuote" : "扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。"
+    } ],
+    "openQuestions" : [ ],
+    "limits" : [ "未定义'扫描版PDF'的技术判定逻辑；未指定'标注未识别范围'的具体数据结构（如坐标单位）；未说明视觉模型调用失败是否重试。" ]
+  },
+  "checks" : {
+    "schemaOk" : false,
+    "groundingOk" : true,
+    "structureOk" : true,
+    "coverageOk" : true,
+    "messages" : [ "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote" ]
+  },
+  "rawAttempts" : [ {
+    "attempt" : 1,
+    "rawOutput" : "{ \"requirementKind\": \"normal\", \"summary\": \"需求明确指定了支持的文件格式（DOCX/PDF）、大小上限（10MB）、解析内容（正文和内嵌图片）、性能约束（≤60秒）、错误反馈要求（具体提示并拒绝上传）、以及扫描版PDF的特殊处理（调用视觉模型、标注未识别范围）。\", \"acceptanceCriteria\": [ { \"id\": \"AC-1\", \"title\": \"支持上传DOCX或PDF格式且≤10MB的文件并成功解析\", \"given\": \"用户处于文档上传页面，本地存在一个大小为9.8MB的合法DOCX文件\", \"when\": \"用户选择该文件并点击上传按钮\", \"then\": \"系统在60秒内完成解析，返回包含正文文本和提取出的内嵌图片的结构化结果\", \"sourceQuote\": \"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。\", \"priority\": \"must\" }, { \"id\": \"AC-2\", \"title\": \"上传超过10MB的文件时，页面显示具体错误原因并阻止上传\", \"given\": \"用户处于文档上传页面，本地存在一个大小为10.2MB的PDF文件\", \"when\": \"用户选择该文件并点击上传按钮\", \"then\": \"页面立即显示提示消息'文件大小超出10MB限制'，且不发起解析请求\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\", \"priority\": \"must\" }, { \"id\": \"AC-3\", \"title\": \"上传非DOCX/PDF格式文件时，页面显示具体错误原因并拒绝上传\", \"given\": \"用户处于文档上传页面，本地存在一个PNG格式图像文件\", \"when\": \"用户选择该PNG文件并点击上传按钮\", \"then\": \"页面立即显示提示消息'仅支持DOCX和PDF格式'，且不发起解析请求\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\", \"priority\": \"must\" }, { \"id\": \"AC-4\", \"title\": \"扫描版PDF中识别失败的页面需在解析结果中标注未识别范围\", \"given\": \"用户上传一个含3页的扫描版PDF，其中第2页因模糊度过高导致视觉模型识别失败\", \"when\": \"系统完成解析（含调用视觉模型）\", \"then\": \"返回的解析结果中，第2页的内容字段标记为'未识别'，并附带坐标范围信息（如：page=2, region=[0,0,595,842]'）\", \"sourceQuote\": \"扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。\", \"priority\": \"must\" } ], \"testSamples\": [ { \"id\": \"TS-1\", \"kind\": \"normal\", \"input\": {\"fileType\": \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\", \"fileSize\": 8388608, \"content\": \"含2页正文+1张内嵌PNG图\"}, \"expected\": \"解析成功，返回JSON含text字段（含全部正文）和images数组（含1个base64编码图片）；总耗时≤60000ms\", \"sourceQuote\": \"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。\" }, { \"id\": \"TS-2\", \"kind\": \"boundary\", \"input\": {\"fileType\": \"application/pdf\", \"fileSize\": 10485760}, \"expected\": \"前端拦截并显示'文件大小超出10MB限制'；HTTP POST /parse 不被触发\", \"sourceQuote\": \"单个文件不超过 10MB。文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\" }, { \"id\": \"TS-3\", \"kind\": \"exception\", \"input\": {\"fileType\": \"application/pdf\", \"fileSize\": 5242880, \"isScanned\": true, \"unrecognizablePage\": 1}, \"expected\": \"解析结果中page=1的content字段值为null或字符串'未识别'，且含region字段描述该页全页范围\", \"sourceQuote\": \"扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。\" } ], \"openQuestions\": [], \"limits\": [\"未定义'扫描版PDF'的技术判定逻辑（如是否依赖/ContentStreams或OCR元数据）；未指定'标注未识别范围'的具体数据结构（如是否要求像素坐标或PDF页内单位）；未说明视觉模型调用失败是否重试或降级处理。\"] }",
+    "checks" : {
+      "schemaOk" : false,
+      "groundingOk" : false,
+      "structureOk" : true,
+      "coverageOk" : true,
+      "messages" : [ "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote", "引用无法在原文中逐字核验：单个文件不超过 10MB。文件超过 10MB 或格式不支持时，页面提示具体原因并…" ]
+    }
+  }, {
+    "attempt" : 2,
+    "rawOutput" : "{ \"requirementKind\": \"normal\", \"summary\": \"需求明确指定了支持的文件格式（DOCX/PDF）、大小上限（10MB）、解析内容（正文和内嵌图片）、性能约束（≤60秒）、错误反馈要求（具体提示并拒绝上传）、以及扫描版PDF的特殊处理（调用视觉模型、标注未识别范围）。\", \"acceptanceCriteria\": [ { \"id\": \"AC-1\", \"title\": \"支持上传DOCX或PDF格式且≤10MB的文件并成功解析\", \"given\": \"用户处于文档上传页面，本地存在一个大小为9.8MB的合法DOCX文件\", \"when\": \"用户选择该文件并点击上传按钮\", \"then\": \"系统在60秒内完成解析，返回包含正文文本和提取出的内嵌图片的结构化结果\", \"sourceQuote\": \"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。\", \"priority\": \"must\" }, { \"id\": \"AC-2\", \"title\": \"上传超过10MB的文件时，页面显示具体错误原因并拒绝上传\", \"given\": \"用户处于文档上传页面，本地存在一个大小为10.2MB的PDF文件\", \"when\": \"用户选择该文件并点击上传按钮\", \"then\": \"页面立即显示提示消息'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且不发起解析请求\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\", \"priority\": \"must\" }, { \"id\": \"AC-3\", \"title\": \"上传非DOCX/PDF格式文件时，页面显示具体错误原因并拒绝上传\", \"given\": \"用户处于文档上传页面，本地存在一个PNG格式图像文件\", \"when\": \"用户选择该PNG文件并点击上传按钮\", \"then\": \"页面立即显示提示消息'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且不发起解析请求\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\", \"priority\": \"must\" }, { \"id\": \"AC-4\", \"title\": \"扫描版PDF中识别失败的页面需在解析结果中标注未识别范围\", \"given\": \"用户上传一个含3页的扫描版PDF，其中第2页因模糊度过高导致视觉模型识别失败\", \"when\": \"系统完成解析（含调用视觉模型）\", \"then\": \"返回的解析结果中，第2页的内容字段标记为'未识别'，并附带坐标范围信息（如：page=2, region=[0,0,595,842]'）\", \"sourceQuote\": \"扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。\", \"priority\": \"must\" } ], \"testSamples\": [ { \"id\": \"TS-1\", \"kind\": \"normal\", \"input\": {\"fileType\": \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\", \"fileSize\": 8388608}, \"expected\": \"系统在60秒内返回包含完整正文文本和所有内嵌图片的解析结果\", \"sourceQuote\": \"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。\" }, { \"id\": \"TS-2\", \"kind\": \"boundary\", \"input\": {\"fileType\": \"application/pdf\", \"fileSize\": 10485760}, \"expected\": \"页面提示'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且未触发后端解析\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\" }, { \"id\": \"TS-3\", \"kind\": \"exception\", \"input\": {\"fileType\": \"application/pdf\", \"fileSize\": 5242880, \"isScanned\": true, \"unrecognizablePage\": 1}, \"expected\": \"解析结果中第1页的content字段值为字符串'未识别'，并包含region字段描述该页范围\", \"sourceQuote\": \"扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。\" } ], \"openQuestions\": [], \"limits\": [\"未定义'扫描版PDF'的技术判定逻辑；未指定'标注未识别范围'的具体数据结构（如坐标单位）；未说明视觉模型调用失败是否重试。\"] }",
+    "checks" : {
+      "schemaOk" : false,
+      "groundingOk" : true,
+      "structureOk" : true,
+      "coverageOk" : true,
+      "messages" : [ "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote" ]
+    }
+  }, {
+    "attempt" : 3,
+    "rawOutput" : "{ \"requirementKind\": \"normal\", \"summary\": \"需求明确指定了支持的文件格式（DOCX/PDF）、大小上限（10MB）、解析内容（正文和内嵌图片）、性能约束（≤60秒）、错误反馈要求（具体提示并拒绝上传）、以及扫描版PDF的特殊处理（调用视觉模型、标注未识别范围）。\", \"acceptanceCriteria\": [ { \"id\": \"AC-1\", \"title\": \"支持上传DOCX或PDF格式且≤10MB的文件并成功解析\", \"given\": \"用户处于文档上传页面，本地存在一个大小为9.8MB的合法DOCX文件\", \"when\": \"用户选择该文件并点击上传按钮\", \"then\": \"系统在60秒内完成解析，返回包含正文文本和提取出的内嵌图片的结构化结果\", \"sourceQuote\": \"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。\", \"priority\": \"must\" }, { \"id\": \"AC-2\", \"title\": \"上传超过10MB的文件时，页面显示具体错误原因并拒绝上传\", \"given\": \"用户处于文档上传页面，本地存在一个大小为10.2MB的PDF文件\", \"when\": \"用户选择该文件并点击上传按钮\", \"then\": \"页面立即显示提示消息'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且不发起解析请求\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\", \"priority\": \"must\" }, { \"id\": \"AC-3\", \"title\": \"上传非DOCX/PDF格式文件时，页面显示具体错误原因并拒绝上传\", \"given\": \"用户处于文档上传页面，本地存在一个PNG格式图像文件\", \"when\": \"用户选择该PNG文件并点击上传按钮\", \"then\": \"页面立即显示提示消息'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且不发起解析请求\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\", \"priority\": \"must\" }, { \"id\": \"AC-4\", \"title\": \"扫描版PDF中识别失败的页面需在解析结果中标注未识别范围\", \"given\": \"用户上传一个含3页的扫描版PDF，其中第2页因模糊度过高导致视觉模型识别失败\", \"when\": \"系统完成解析（含调用视觉模型）\", \"then\": \"返回的解析结果中，第2页的内容字段标记为'未识别'，并附带region字段描述该页全页范围（如[0,0,595,842]）\", \"sourceQuote\": \"扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。\", \"priority\": \"must\" } ], \"testSamples\": [ { \"id\": \"TS-1\", \"kind\": \"normal\", \"input\": {\"fileType\": \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\", \"fileSize\": 8388608}, \"expected\": \"系统在60秒内返回包含完整正文文本和所有内嵌图片的解析结果\", \"sourceQuote\": \"用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。\" }, { \"id\": \"TS-2\", \"kind\": \"boundary\", \"input\": {\"fileType\": \"application/pdf\", \"fileSize\": 10485760}, \"expected\": \"页面提示'文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。'，且未触发后端解析\", \"sourceQuote\": \"文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。\" }, { \"id\": \"TS-3\", \"kind\": \"exception\", \"input\": {\"fileType\": \"application/pdf\", \"fileSize\": 5242880, \"isScanned\": true, \"unrecognizablePage\": 1}, \"expected\": \"解析结果中第1页的content字段值为字符串'未识别'，且包含region字段（如region=[0,0,595,842]）\", \"sourceQuote\": \"扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。\" } ], \"openQuestions\": [], \"limits\": [\"未定义'扫描版PDF'的技术判定逻辑；未指定'标注未识别范围'的具体数据结构（如坐标单位）；未说明视觉模型调用失败是否重试。\"] }",
+    "checks" : {
+      "schemaOk" : false,
+      "groundingOk" : true,
+      "structureOk" : true,
+      "coverageOk" : true,
+      "messages" : [ "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote", "测试样例缺少 id/kind/input/expected/sourceQuote" ]
+    }
+  } ]
+}

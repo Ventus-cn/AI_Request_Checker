@@ -1,0 +1,67 @@
+{
+  "id": "AC-07",
+  "category": "insufficient",
+  "title": "只有一个功能名",
+  "expectedKind": "insufficient",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133246-884686",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 4978,
+  "backendDurationMs": 4931,
+  "usage": {
+    "promptTokens": 175,
+    "completionTokens": 205,
+    "totalTokens": 380
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 1,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "信息不足处理不完整：kind=None, AC=1, 问题=5",
+      "requirementKind=None，期望 insufficient"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "系统需提供导出功能",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "用户可触发导出操作",
+        "given": "用户已登录并处于支持导出的数据列表页面",
+        "when": "点击‘导出’按钮",
+        "then": "系统开始准备导出数据，显示进度提示或进入导出流程",
+        "sourceQuote": "增加一个导出功能。",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "在数据列表页点击‘导出’按钮",
+        "expected": "系统响应导出请求，无报错，进入导出处理状态",
+        "sourceQuote": "增加一个导出功能。"
+      }
+    ],
+    "openQuestions": [
+      "导出的数据格式（如CSV、Excel、PDF）？",
+      "导出的数据范围（当前页/全部数据/筛选后数据）？",
+      "是否需要导出权限控制？",
+      "导出文件命名规则和存储位置？",
+      "导出失败时的错误提示和重试机制？"
+    ]
+  }
+}

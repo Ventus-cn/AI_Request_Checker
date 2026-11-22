@@ -13,7 +13,7 @@ type AgentStep={index:number;tool:string;args:string;resultPreview:string;status
 type AgentRun={taskId:string;status:string;answer:string;steps:AgentStep[];confirm?:{tool:string;impact:string};error?:string}
 type AcceptanceCriterion={id:string;title:string;given:string;when:string;then:string;sourceQuote:string;priority:string}
 type AcceptanceTestSample={id:string;kind:string;input:string;expected:string;sourceQuote:string}
-type AcceptanceReport={summary:string;requirementKind?:string;acceptanceCriteria:AcceptanceCriterion[];testSamples:AcceptanceTestSample[];openQuestions:string[]}
+type AcceptanceReport={summary:string;requirementKind?:string;acceptanceCriteria:AcceptanceCriterion[];testSamples:AcceptanceTestSample[];openQuestions:string[];limits?:string[]}
 type AcceptanceChecks={schemaOk:boolean;groundingOk:boolean;structureOk:boolean;coverageOk:boolean;messages:string[]}
 type AcceptanceRun={runId:string;status:string;promptVersion:string;model:string;durationMs:number;usage:{promptTokens:number;completionTokens:number;totalTokens:number};report?:AcceptanceReport;checks?:AcceptanceChecks;attempts?:number;error?:string}
 
@@ -200,6 +200,10 @@ onMounted(loadHistory)
               <div v-if="acRun.report.openQuestions.length" class="acceptance-questions">
                 <h4>待确认问题</h4>
                 <ul><li v-for="(q,i) in acRun.report.openQuestions" :key="i">{{q}}</li></ul>
+              </div>
+              <div v-if="acRun.report.limits?.length" class="acceptance-questions">
+                <h4>本次限制</h4>
+                <ul><li v-for="(q,i) in acRun.report.limits" :key="i">{{q}}</li></ul>
               </div>
             </div>
           </template>

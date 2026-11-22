@@ -1,0 +1,3 @@
+{"runId":"20261122-134124-cb3672","ts":"2026-11-22T13:41:24.527983600+08:00","attempt":0,"phase":"context","model":"qwen-plus","inputPreview":"帮我采购 20 台服务器，要求报价最低的供应商，并在本周内完成付款审批。服务器到货后由行政部分配给各项目组。","mode":"model","inputChars":54,"version":"revised"}
+{"runId":"20261122-134124-cb3672","ts":"2026-11-22T13:41:24.529986+08:00","attempt":0,"phase":"check","result":"OUT_OF_SCOPE","status":"ok"}
+{"runId":"20261122-134124-cb3672","ts":"2026-11-22T13:41:24.531980900+08:00","attempt":0,"phase":"finish","status":"REFUSED","durationMs":2}

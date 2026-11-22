@@ -1,0 +1,88 @@
+{
+  "id": "AC-02",
+  "category": "normal",
+  "title": "文件上传与解析",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-c94061",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 29,
+  "backendDurationMs": 4,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 4,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "测试样例未覆盖三类：['normal']",
+      "requirementKind=None，期望 normal"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB",
+        "sourceQuote": "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "上传后系统解析正文和内嵌图片，解析时间不超过 60 秒",
+        "sourceQuote": "上传后系统解析正文和内嵌图片，解析时间不超过 60 秒",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "需求语句 3",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传",
+        "sourceQuote": "文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "需求语句 4",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围",
+        "sourceQuote": "扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB"
+      }
+    ],
+    "openQuestions": []
+  }
+}

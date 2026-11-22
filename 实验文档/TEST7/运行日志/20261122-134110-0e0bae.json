@@ -1,0 +1,38 @@
+{
+  "runId" : "20261122-134110-0e0bae",
+  "promptVersion" : "revised",
+  "mode" : "model",
+  "model" : "qwen-plus",
+  "durationMs" : 4636,
+  "promptTokens" : 660,
+  "completionTokens" : 197,
+  "attempts" : 1,
+  "inputChars" : 15,
+  "input" : "系统要快一点，用户体验好一些。",
+  "report" : {
+    "requirementKind" : "insufficient",
+    "summary" : "需求缺乏可验证的性能指标、具体场景、用户角色、输入输出定义及验收口径，无法生成可执行的验收标准",
+    "acceptanceCriteria" : [ ],
+    "testSamples" : [ ],
+    "openQuestions" : [ "‘快一点’的具体性能指标是什么？例如页面加载时间需≤1秒，还是接口响应时间需≤200ms？", "‘用户体验好一些’对应哪些可观测、可测量的行为或结果？例如操作成功率提升、错误率下降、任务完成时间缩短，或NPS提升？", "该需求面向哪类用户（如普通用户、管理员）在哪个具体功能场景下提出？例如登录、搜索、文件上传等？" ],
+    "limits" : [ "未指定任何技术上下文、平台环境、基准对比条件（如较上一版本提升30%），无法定义boundary或exception测试样例；不满足验收标准所需的可观察性与可验证性要求" ]
+  },
+  "checks" : {
+    "schemaOk" : true,
+    "groundingOk" : true,
+    "structureOk" : true,
+    "coverageOk" : true,
+    "messages" : [ ]
+  },
+  "rawAttempts" : [ {
+    "attempt" : 1,
+    "rawOutput" : "{\"requirementKind\":\"insufficient\",\"summary\":\"需求缺乏可验证的性能指标、具体场景、用户角色、输入输出定义及验收口径，无法生成可执行的验收标准\",\"acceptanceCriteria\":[],\"testSamples\":[],\"openQuestions\":[\"‘快一点’的具体性能指标是什么？例如页面加载时间需≤1秒，还是接口响应时间需≤200ms？\",\"‘用户体验好一些’对应哪些可观测、可测量的行为或结果？例如操作成功率提升、错误率下降、任务完成时间缩短，或NPS提升？\",\"该需求面向哪类用户（如普通用户、管理员）在哪个具体功能场景下提出？例如登录、搜索、文件上传等？\"],\"limits\":[\"未指定任何技术上下文、平台环境、基准对比条件（如较上一版本提升30%），无法定义boundary或exception测试样例；不满足验收标准所需的可观察性与可验证性要求\"]}",
+    "checks" : {
+      "schemaOk" : true,
+      "groundingOk" : true,
+      "structureOk" : true,
+      "coverageOk" : true,
+      "messages" : [ ]
+    }
+  } ]
+}

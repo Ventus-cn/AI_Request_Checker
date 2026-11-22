@@ -1,0 +1,89 @@
+{
+  "id": "AC-12",
+  "category": "boundary",
+  "title": "自相矛盾的数量约束",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-16f7a6",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 10,
+  "backendDurationMs": 2,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 4,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "测试样例未覆盖三类：['normal']",
+      "requirementKind=None，期望 normal"
+    ],
+    "conflict_flagged": false
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包",
+        "sourceQuote": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "但只允许上传不超过 0 字节的文件",
+        "sourceQuote": "但只允许上传不超过 0 字节的文件",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "需求语句 3",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "上传成功后必须在 0 秒内返回结果",
+        "sourceQuote": "上传成功后必须在 0 秒内返回结果",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "需求语句 4",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "失败时不需要任何提示",
+        "sourceQuote": "失败时不需要任何提示",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包"
+      }
+    ],
+    "openQuestions": []
+  }
+}

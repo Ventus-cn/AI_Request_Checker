@@ -1,0 +1,61 @@
+{
+  "id": "AC-05",
+  "category": "insufficient",
+  "title": "只有主观描述",
+  "expectedKind": "insufficient",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-dfc5da",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 20,
+  "backendDurationMs": 3,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 1,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "信息不足处理不完整：kind=None, AC=1, 问题=0",
+      "requirementKind=None，期望 insufficient"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "系统要快一点，用户体验好一些",
+        "sourceQuote": "系统要快一点，用户体验好一些",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "系统要快一点，用户体验好一些",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "系统要快一点，用户体验好一些"
+      }
+    ],
+    "openQuestions": []
+  }
+}

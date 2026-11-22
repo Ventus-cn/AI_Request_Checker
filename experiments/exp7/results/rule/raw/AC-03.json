@@ -1,0 +1,88 @@
+{
+  "id": "AC-03",
+  "category": "normal",
+  "title": "审查报告导出 PDF",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133055-4ab196",
+  "promptVersion": "revised",
+  "model": "rule-baseline",
+  "latencyMs": 29,
+  "backendDurationMs": 5,
+  "usage": {
+    "promptTokens": 0,
+    "completionTokens": 0,
+    "totalTokens": 0
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 4,
+  "testCount": 1,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "测试样例未覆盖三类：['normal']",
+      "requirementKind=None，期望 normal"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "按句子模板生成的初版验收标准（无 AI 基线）",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "需求语句 1",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "审查完成后，用户可以点击“导出 PDF”下载当前审查报告",
+        "sourceQuote": "审查完成后，用户可以点击“导出 PDF”下载当前审查报告",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "需求语句 2",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "报告包含全部发现项、原文引用、验收标准和检索来源，不受页面筛选影响",
+        "sourceQuote": "报告包含全部发现项、原文引用、验收标准和检索来源，不受页面筛选影响",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "需求语句 3",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "导出过程不调用大模型",
+        "sourceQuote": "导出过程不调用大模型",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "需求语句 4",
+        "given": "系统已部署并处于可用状态",
+        "when": "用户按需求描述执行操作",
+        "then": "中文字体需要嵌入 PDF，保证在其他电脑上打开时不乱码",
+        "sourceQuote": "中文字体需要嵌入 PDF，保证在其他电脑上打开时不乱码",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "审查完成后，用户可以点击“导出 PDF”下载当前审查报告",
+        "expected": "系统返回符合该句描述的结果",
+        "sourceQuote": "审查完成后，用户可以点击“导出 PDF”下载当前审查报告"
+      }
+    ],
+    "openQuestions": []
+  }
+}

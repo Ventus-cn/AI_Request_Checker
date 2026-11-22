@@ -1,0 +1,97 @@
+{
+  "id": "AC-08",
+  "category": "out_of_scope",
+  "title": "硬件采购与付款审批",
+  "expectedKind": "out_of_scope",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133251-96a09a",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 17114,
+  "backendDurationMs": 17077,
+  "usage": {
+    "promptTokens": 204,
+    "completionTokens": 761,
+    "totalTokens": 965
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 3,
+  "testCount": 3,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "超范围处理不完整：kind=None, AC=3",
+      "requirementKind=None，期望 out_of_scope"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "采购20台服务器，选择报价最低的供应商，本周内完成付款审批，到货后由行政部门统一分配给各项目组。",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "选定报价最低的供应商",
+        "given": "至少3家合格供应商已提交有效报价",
+        "when": "系统或采购人员比较所有有效报价",
+        "then": "选定单价与总价均最低的供应商（含运费、税金等全部费用）",
+        "sourceQuote": "要求报价最低的供应商",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "付款审批在本周内完成",
+        "given": "采购合同已签署且付款申请已提交",
+        "when": "启动付款审批流程",
+        "then": "所有审批节点（财务、法务、分管领导）在当前自然周的周五17:00前完成终审并生成审批通过记录",
+        "sourceQuote": "并在本周内完成付款审批",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "行政部执行到货分配",
+        "given": "20台服务器全部到货且验收合格",
+        "when": "行政部收到到货确认通知",
+        "then": "在3个工作日内完成服务器登记、标签打印及按项目组需求分配，并输出分配清单",
+        "sourceQuote": "服务器到货后由行政部分配给各项目组",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "供应商A报价¥1,200,000；供应商B报价¥1,185,000；供应商C报价¥1,192,000；当前日期为周三",
+        "expected": "选定供应商B；付款审批须于本周五17:00前完成终审",
+        "sourceQuote": "帮我采购 20 台服务器，要求报价最低的供应商，并在本周内完成付款审批。服务器到货后由行政部分配给各项目组。"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "当前日期为周五16:55，付款申请刚提交至第一审批人",
+        "expected": "审批流程仍可在截止前完成（即17:00前所有节点完成），视为满足‘本周内完成付款审批’",
+        "sourceQuote": "并在本周内完成付款审批"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "仅1家供应商提交有效报价",
+        "expected": "触发比价失败预警，需采购负责人书面说明原因并升级审批，不得直接下单",
+        "sourceQuote": "要求报价最低的供应商"
+      }
+    ],
+    "openQuestions": [
+      "‘本周内’是否指自然周还是财年工作周？",
+      "若多家供应商总报价相同，是否定义并列最低时的决策规则（如交货期优先）？",
+      "行政部分配是否需依据项目组预先提交的需求清单？该清单是否为强制输入前提？"
+    ]
+  }
+}

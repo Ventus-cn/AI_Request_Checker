@@ -1,0 +1,124 @@
+{
+  "id": "AC-12",
+  "category": "boundary",
+  "title": "自相矛盾的数量约束",
+  "expectedKind": "normal",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133402-668c64",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 18113,
+  "backendDurationMs": 18088,
+  "usage": {
+    "promptTokens": 219,
+    "completionTokens": 802,
+    "totalTokens": 1021
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 5,
+  "testCount": 4,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": false,
+    "coverageOk": true,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "引用无法在原文核验：只允许上传不超过 0 字节的文件。失败时不需要任何提示。",
+      "引用无法在原文核验：系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和",
+      "requirementKind=None，期望 normal"
+    ],
+    "conflict_flagged": false
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "系统需支持所有文件格式上传，但仅允许大小为0字节的文件，且上传响应必须在0秒内完成，失败时无提示。",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "支持所有文件格式",
+        "given": "用户准备任意格式的文件（如DOCX、PDF、EXE、ZIP等）",
+        "when": "尝试上传该文件",
+        "then": "系统不因文件扩展名或MIME类型拒绝上传",
+        "sourceQuote": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包",
+        "priority": "must"
+      },
+      {
+        "id": "AC-2",
+        "title": "仅允许0字节文件上传",
+        "given": "用户准备一个非零字节的文件",
+        "when": "提交上传请求",
+        "then": "上传被拒绝，HTTP状态码非2xx，且无前端提示或错误消息",
+        "sourceQuote": "只允许上传不超过 0 字节的文件",
+        "priority": "must"
+      },
+      {
+        "id": "AC-3",
+        "title": "0字节文件必须成功上传",
+        "given": "用户准备一个严格为0字节的文件（如空文本文件）",
+        "when": "提交上传请求",
+        "then": "返回HTTP 2xx状态码，响应体包含成功标识（如{status: 'success'}）",
+        "sourceQuote": "只允许上传不超过 0 字节的文件",
+        "priority": "must"
+      },
+      {
+        "id": "AC-4",
+        "title": "上传响应时间≤0秒",
+        "given": "系统处于正常负载状态，上传0字节文件",
+        "when": "发起上传请求并记录起止时间",
+        "then": "端到端响应时间测量值 ≤ 0 秒（即瞬时完成，无可观测延迟）",
+        "sourceQuote": "上传成功后必须在 0 秒内返回结果",
+        "priority": "must"
+      },
+      {
+        "id": "AC-5",
+        "title": "失败时无任何提示",
+        "given": "上传被拒绝（如文件大小>0字节）",
+        "when": "请求完成",
+        "then": "前端界面无Toast、弹窗、日志、控制台输出或网络响应体中的错误信息",
+        "sourceQuote": "失败时不需要任何提示",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "一个0字节的空BIN文件",
+        "expected": "HTTP 200，响应体含{status: 'success'}，耗时0ms",
+        "sourceQuote": "只允许上传不超过 0 字节的文件。上传成功后必须在 0 秒内返回结果。"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "一个1字节的TXT文件",
+        "expected": "HTTP 400或413，空响应体，前端无视觉/交互反馈",
+        "sourceQuote": "只允许上传不超过 0 字节的文件。失败时不需要任何提示。"
+      },
+      {
+        "id": "TS-3",
+        "kind": "exception",
+        "input": "一个10MB的PDF文件",
+        "expected": "HTTP 413或500，无响应体，前端无提示，服务端日志中不得出现用户可见错误消息",
+        "sourceQuote": "失败时不需要任何提示。"
+      },
+      {
+        "id": "TS-4",
+        "kind": "boundary",
+        "input": "一个0字节的.EXE文件",
+        "expected": "HTTP 200，响应体含{status: 'success'}，耗时0ms",
+        "sourceQuote": "系统必须支持所有文件格式，包括 DOCX、PDF、EXE 和压缩包。"
+      }
+    ],
+    "openQuestions": [
+      "'0秒内返回结果'是否指服务器处理时间≤0ms，还是包含网络传输？若含传输，则物理上不可行，需澄清定义。",
+      "'支持所有文件格式'是否包含校验文件头（magic bytes）以防范扩展名伪造？原文未说明。",
+      "当上传0字节文件时，系统是否需持久化存储该文件，或仅校验后即丢弃？"
+    ]
+  }
+}

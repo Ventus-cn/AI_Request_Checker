@@ -1,0 +1,72 @@
+{
+  "id": "AC-05",
+  "category": "insufficient",
+  "title": "只有主观描述",
+  "expectedKind": "insufficient",
+  "httpStatus": 200,
+  "status": "SUCCESS",
+  "error": null,
+  "runId": "20261122-133233-936a96",
+  "promptVersion": "original",
+  "model": "qwen-plus",
+  "latencyMs": 6706,
+  "backendDurationMs": 6654,
+  "usage": {
+    "promptTokens": 178,
+    "completionTokens": 288,
+    "totalTokens": 466
+  },
+  "attempts": null,
+  "requirementKind": null,
+  "acCount": 1,
+  "testCount": 2,
+  "checks": {
+    "schemaOk": true,
+    "structureOk": true,
+    "groundingOk": true,
+    "coverageOk": false,
+    "kindOk": false,
+    "mustMentionOk": true,
+    "messages": [
+      "信息不足处理不完整：kind=None, AC=1, 问题=3",
+      "requirementKind=None，期望 insufficient"
+    ]
+  },
+  "usable": null,
+  "judgmentNote": "",
+  "report": {
+    "summary": "提升系统响应速度以改善用户体验",
+    "acceptanceCriteria": [
+      {
+        "id": "AC-1",
+        "title": "关键操作响应时间达标",
+        "given": "系统处于正常负载状态",
+        "when": "用户执行典型业务操作（如页面加载、表单提交、搜索查询）",
+        "then": "95%的请求响应时间 ≤ 2秒，最大响应时间 ≤ 5秒",
+        "sourceQuote": "系统要快一点，用户体验好一些。",
+        "priority": "must"
+      }
+    ],
+    "testSamples": [
+      {
+        "id": "TS-1",
+        "kind": "normal",
+        "input": "用户在首页点击搜索按钮并输入关键词“测试”",
+        "expected": "搜索结果页面在2秒内完全渲染并可交互",
+        "sourceQuote": "系统要快一点，用户体验好一些。"
+      },
+      {
+        "id": "TS-2",
+        "kind": "boundary",
+        "input": "并发100用户同时提交订单",
+        "expected": "95%订单提交请求响应时间 ≤ 2秒，无超时或错误提示",
+        "sourceQuote": "系统要快一点，用户体验好一些。"
+      }
+    ],
+    "openQuestions": [
+      "‘快一点’的具体性能指标（如P95响应时间、首屏加载时间）是否已有定义？",
+      "‘用户体验好一些’是否包含可量化的可用性指标（如任务完成率、错误率、满意度NPS）？",
+      "需明确‘正常负载状态’的基准（如并发用户数、数据规模、硬件配置）"
+    ]
+  }
+}

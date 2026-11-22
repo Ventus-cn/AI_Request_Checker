@@ -1,0 +1,69 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#fff;color:#1e2637;font-family:"Microsoft YaHei","PingFang SC",sans-serif;padding:30px 36px}
+h1{font-size:21px;margin-bottom:4px} .sub{font-size:11px;color:#66708a;margin-bottom:18px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.card{border:1px solid #dbe3f0;border-radius:10px;padding:14px 16px;background:#fbfdff}
+.card-title{font-size:12px;font-weight:700;border-left:4px solid #999;padding-left:8px;margin-bottom:8px}
+.big{font-size:30px;font-weight:800;color:#1e2637} .big small{display:block;font-size:10px;color:#7a8499;font-weight:500;margin-top:2px}
+.kv{display:flex;justify-content:space-between;font-size:10.5px;color:#66708a;padding:3px 0;border-bottom:1px dashed #edf1f8}
+.kv b{color:#28324a}
+.charts{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:20px}
+.chart{border:1px solid #dbe3f0;border-radius:10px;padding:12px 14px}
+.chart h3{font-size:11.5px;margin-bottom:8px;color:#3b465e}
+.bar-row{display:grid;grid-template-columns:86px 1fr 46px;align-items:center;gap:8px;margin:6px 0}
+.bar-label{font-size:10px;color:#5f6b84} .bar{height:8px;background:#eef2f8;border-radius:5px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:5px} .bar-row b{font-size:10px;color:#3b465e;text-align:right}
+table{width:100%;border-collapse:collapse;font-size:10.5px}
+th,td{border:1px solid #dde4f0;padding:6px 8px;text-align:center}
+th{background:#eef3fb;font-weight:700;color:#3b465e} td.id{font-weight:700;text-align:left}
+.yes{color:#2e9e74;font-weight:700} .no{color:#cf5b6c;font-weight:700}
+.note{font-size:9.5px;color:#7a8499;margin-top:10px;line-height:1.7}
+</style></head><body>
+<h1>实验7 原型评测：基线与两个版本对比</h1>
+<div class="sub">同一测试集（12 例：正常 4、信息不足 3、超出范围 2、边界 3）；模型 revised / qwen-plus；同一检查规则；耗时包含网络往返</div>
+<div class="cards"><div class="card"><div class="card-title" style="border-color:#8a93a8">无 AI 基线</div>
+        <div class="big">0%<small>程序可接受</small></div>
+        <div class="kv"><span>结构合法</span><b>100%</b></div>
+        <div class="kv"><span>引用可核验</span><b>100%</b></div>
+        <div class="kv"><span>三类覆盖</span><b>0%</b></div>
+        <div class="kv"><span>类型判定</span><b>0%</b></div>
+        <div class="kv"><span>人工可用</span><b>0%</b></div>
+        <div class="kv"><span>平均耗时</span><b>27 ms</b></div>
+        <div class="kv"><span>总 Token</span><b>0</b></div>
+        <div class="kv"><span>估算费用</span><b>¥0.0</b></div></div><div class="card"><div class="card-title" style="border-color:#4f7fd8">初版 v1</div>
+        <div class="big">17%<small>程序可接受</small></div>
+        <div class="kv"><span>结构合法</span><b>83%</b></div>
+        <div class="kv"><span>引用可核验</span><b>75%</b></div>
+        <div class="kv"><span>三类覆盖</span><b>33%</b></div>
+        <div class="kv"><span>类型判定</span><b>0%</b></div>
+        <div class="kv"><span>人工可用</span><b>8%</b></div>
+        <div class="kv"><span>平均耗时</span><b>17050 ms</b></div>
+        <div class="kv"><span>总 Token</span><b>11799</b></div>
+        <div class="kv"><span>估算费用</span><b>¥0.0203</b></div></div><div class="card"><div class="card-title" style="border-color:#2e9e74">修订版 v2</div>
+        <div class="big">100%<small>程序可接受</small></div>
+        <div class="kv"><span>结构合法</span><b>100%</b></div>
+        <div class="kv"><span>引用可核验</span><b>100%</b></div>
+        <div class="kv"><span>三类覆盖</span><b>100%</b></div>
+        <div class="kv"><span>类型判定</span><b>100%</b></div>
+        <div class="kv"><span>人工可用</span><b>92%</b></div>
+        <div class="kv"><span>平均耗时</span><b>12547 ms</b></div>
+        <div class="kv"><span>总 Token</span><b>13810</b></div>
+        <div class="kv"><span>估算费用</span><b>¥0.019</b></div></div></div>
+<div class="charts"><div class="chart"><h3>引用可核验率</h3><div class="bar-row"><span class="bar-label">无 AI 基线</span>
+            <div class="bar"><i style="width:100%;background:#8a93a8"></i></div>
+            <b>100%</b></div><div class="bar-row"><span class="bar-label">初版 v1</span>
+            <div class="bar"><i style="width:75%;background:#4f7fd8"></i></div>
+            <b>75%</b></div><div class="bar-row"><span class="bar-label">修订版 v2</span>
+            <div class="bar"><i style="width:100%;background:#2e9e74"></i></div>
+            <b>100%</b></div></div><div class="chart"><h3>三类覆盖与信息不足处理</h3><div class="bar-row"><span class="bar-label">无 AI 基线</span>
+            <div class="bar"><i style="width:1%;background:#8a93a8"></i></div>
+            <b>0%</b></div><div class="bar-row"><span class="bar-label">初版 v1</span>
+            <div class="bar"><i style="width:33%;background:#4f7fd8"></i></div>
+            <b>33%</b></div><div class="bar-row"><span class="bar-label">修订版 v2</span>
+            <div class="bar"><i style="width:100%;background:#2e9e74"></i></div>
+            <b>100%</b></div></div></div>
+<table><thead><tr><th>编号</th><th>类别</th><th>无 AI 基线</th><th>初版 v1</th><th>修订版 v2</th></tr></thead>
+<tbody><tr><td class='id'>AC-01</td><td>normal</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-02</td><td>normal</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-03</td><td>normal</td><td class='no'>✗</td><td class='yes'>✓</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-04</td><td>normal</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-05</td><td>insufficient</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-06</td><td>insufficient</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-07</td><td>insufficient</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-08</td><td>out_of_scope</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-09</td><td>out_of_scope</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-10</td><td>boundary</td><td class='no'>✗</td><td class='yes'>✓</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-11</td><td>boundary</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr><tr><td class='id'>AC-12</td><td>boundary</td><td class='no'>✗</td><td class='no'>✗</td><td class='yes'>✓</td></tr></tbody></table>
+<div class="note">✓ 表示结构、引用、GWT 与覆盖四项程序检查同时通过；基线没有 requirementKind 字段，不计入类型判定。费用按输入 0.0008 元/千 Token、输出 0.002 元/千 Token 估算。人工判断见报告表 3-12。</div>
+</body></html>

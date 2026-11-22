@@ -80,6 +80,18 @@ class Page {
       await sleep(200);
     }
   }
+  async shotFixed(name, height = 1100) {
+    await this.send("Emulation.setDeviceMetricsOverride", {
+      width: 1500, height, deviceScaleFactor: 1, mobile: false,
+    });
+    await sleep(400);
+    const { data } = await this.send("Page.captureScreenshot", {
+      format: "png", captureBeyondViewport: false, fromSurface: true,
+    });
+    fs.writeFileSync(path.join(SHOTS, name), Buffer.from(data, "base64"));
+    console.log("saved", name, `1500x${height}`);
+  }
+
   async shot(name) {
     const metrics = await this.send("Page.getLayoutMetrics");
     const content = metrics.cssContentSize || metrics.contentSize;
@@ -165,8 +177,8 @@ async function ui(page) {
   await runAcceptance(page, samples["AC-02"].text, "图3-2-正常生成.png");
   await runAcceptance(page, samples["AC-06"].text, "图3-3-信息不足.png");
   await runAcceptance(page, samples["AC-08"].text, "图3-4-超出范围.png");
-  await runAcceptance(page, samples["AC-11"].text, "图3-5-提示注入.png");
-  await runAcceptance(page, samples["AC-10"].text, "图3-6-长需求冲突.png");
+  await runAcceptance(page, samples["AC-11"].text, "图3-6-提示注入.png");
+  await runAcceptance(page, samples["AC-10"].text, "图3-7-长需求冲突.png");
 }
 
 async function figures(page) {
@@ -174,7 +186,7 @@ async function figures(page) {
   const dashboard = path.join(ROOT, "实验文档", "TEST7", "图", "评测看板.html");
   await page.navigate("file:///" + diagram.replaceAll("\\", "/"));
   await sleep(900);
-  await page.shot("图3-7-数据流图.png");
+  await page.shot("图3-5-数据流图.png");
   await page.navigate("file:///" + dashboard.replaceAll("\\", "/"));
   await sleep(900);
   await page.shot("图3-8-评测看板.png");
@@ -184,8 +196,8 @@ async function github(page) {
   const url = process.argv[3];
   if (!url) throw new Error("缺少 GitHub 地址");
   await page.navigate(url);
-  await sleep(3000);
-  await page.shot("图3-9-仓库与版本.png");
+  await sleep(4000);
+  await page.shotFixed("图3-9-仓库与版本.png", 1000);
 }
 
 try {

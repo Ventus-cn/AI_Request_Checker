@@ -14,6 +14,7 @@
 | `results/<label>/` | 每次评测的 `results.json`、`summary.md` 与逐样例原始输出 |
 | `smoke.py` | 单样例联调脚本 |
 | `dashboard.html` | 评测结果对比看板（报告截图来源） |
+| `build_ea_diagram.ps1` | Enterprise Architect 15 数据流图生成脚本（导出 PDF 后渲染为报告图3-5） |
 
 ## 启动
 

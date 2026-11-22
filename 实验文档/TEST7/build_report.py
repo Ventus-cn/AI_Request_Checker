@@ -26,10 +26,17 @@ normal.font.name = "微软雅黑"
 normal.element.rPr.rFonts.set(qn("w:eastAsia"), "微软雅黑")
 normal.font.size = Pt(10.5)
 
+def strip_theme_fonts(rfonts):
+    for attr in ("w:asciiTheme", "w:hAnsiTheme", "w:eastAsiaTheme", "w:cstheme"):
+        if rfonts.get(qn(attr)) is not None:
+            del rfonts.attrib[qn(attr)]
+
+
 for name, size, before in [("Heading 1", 15, 20), ("Heading 2", 12.5, 9), ("Heading 3", 11, 9)]:
     st = doc.styles[name]
     st.font.name = "微软雅黑"
     st.element.rPr.rFonts.set(qn("w:eastAsia"), "微软雅黑")
+    strip_theme_fonts(st.element.rPr.rFonts)
     st.font.size = Pt(size)
     st.font.bold = True
     st.font.color.rgb = RGBColor(0, 0, 0)
@@ -39,6 +46,7 @@ for name, size, before in [("Heading 1", 15, 20), ("Heading 2", 12.5, 9), ("Head
 title_style = doc.styles["Title"]
 title_style.font.name = "微软雅黑"
 title_style.element.rPr.rFonts.set(qn("w:eastAsia"), "微软雅黑")
+strip_theme_fonts(title_style.element.rPr.rFonts)
 title_style.font.size = Pt(20)
 title_style.font.bold = True
 title_style.font.color.rgb = RGBColor(0, 0, 0)
@@ -520,6 +528,15 @@ r2._r.append(instr)
 r2._r.append(fld_end)
 r3 = footer_p.add_run(" 页")
 r3.font.size = Pt(9)
+
+for p in doc.paragraphs:
+    if p.style.name in ("Title", "Heading 1", "Heading 2", "Heading 3"):
+        for r in p.runs:
+            r.font.name = "微软雅黑"
+            rfonts = r._element.get_or_add_rPr().get_or_add_rFonts()
+            rfonts.set(qn("w:eastAsia"), "微软雅黑")
+            rfonts.set(qn("w:cs"), "微软雅黑")
+            strip_theme_fonts(rfonts)
 
 doc.save(str(OUT))
 print(OUT)

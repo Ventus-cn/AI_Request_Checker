@@ -36,3 +36,40 @@
 .status-chip.NEED_CONFIRM{background:#44351b;color:#ffd483;border-color:#8e6b35}
 .status-chip.DENIED,.status-chip.FAILED,.status-chip.CHECK_FAILED,.status-chip.STEP_LIMIT,.status-chip.TIMEOUT{background:#461f37;color:#ff91a2;border-color:#8d3f5d}
 @media(max-width:1100px){.agent-grid{grid-template-columns:1fr}.agent-ask,.agent-answer{min-height:0}}
+
+/* ---- Acceptance criteria workspace ---- */
+.acceptance-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px;align-items:start}
+.acceptance-input,.acceptance-result{padding:22px;min-height:520px}
+.acceptance-input .el-textarea__inner{min-height:230px!important}
+.acceptance-config{display:flex;align-items:center;gap:12px;margin:4px 0 16px}
+.acceptance-config label{font-size:10px;color:#8290ab;white-space:nowrap}
+.acceptance-run-btn{width:100%;justify-content:center}
+.acceptance-checks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 10px}
+.acceptance-checks>div{padding:9px 10px;border:1px solid #4a2a44;background:#2a1a2e;border-radius:8px;display:flex;flex-direction:column;gap:4px}
+.acceptance-checks>div.pass{border-color:#2f7068;background:#10302f}
+.acceptance-checks b{font-size:9px;color:#a9b6d2;font-weight:600}
+.acceptance-checks span{font-size:11px;color:#ff9daf;font-weight:700}
+.acceptance-checks>div.pass span{color:#6de0b2}
+.acceptance-summary{font-size:12px;line-height:1.75;color:#e6ecfb;margin:10px 0}
+.acceptance-meta{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:#8290ab;border-top:1px solid #202943;border-bottom:1px solid #202943;padding:9px 0;margin-bottom:12px}
+.acceptance-error{font-size:11px;line-height:1.7;color:#ffb3c2;background:#3d1d2b;border:1px solid #8d3f5d;border-radius:8px;padding:10px 12px}
+.acceptance-list{display:flex;flex-direction:column;gap:9px;max-height:300px;overflow:auto;padding-right:3px}
+.ac-card{border:1px solid #2a3552;background:#101a2f;border-radius:9px;padding:11px 12px}
+.ac-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}
+.ac-head b{font-size:11px;color:#dbe4f8}
+.ac-priority{font-size:9px;padding:3px 7px;border-radius:10px;background:#29245a;color:#c0b5ff;flex:none}
+.ac-priority.must{background:#3d1d2b;color:#ff9daf}
+.ac-priority.should{background:#44351b;color:#ffd483}
+.ac-priority.could{background:#123c38;color:#6de0b2}
+.ac-gwt{display:flex;gap:8px;font-size:11px;line-height:1.6;color:#bdc9e2;margin:4px 0}
+.ac-gwt span{flex:none;width:42px;font-size:9px;font-weight:700;color:#8d9bbb;letter-spacing:.5px;padding-top:2px}
+.ac-quote{margin:8px 0 0;padding:7px 9px;border-left:2px solid #6b5bd2;background:#191d3a;border-radius:0 6px 6px 0;font-size:10px;line-height:1.6;color:#a9b6d2}
+.acceptance-tests h4,.acceptance-questions h4{font-size:11px;color:#c9d3ea;margin:14px 0 7px}
+.ts-row{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #253253}
+.ts-row b{font-size:10px;color:#a5b6df}
+.ts-row p{font-size:11px;line-height:1.6;color:#9dabc7;margin:2px 0 0}
+.kind-badge{flex:none;font-size:9px;padding:3px 7px;border-radius:10px;background:#29245a;color:#c0b5ff;margin-top:2px}
+.kind-badge.boundary{background:#44351b;color:#ffd483}
+.kind-badge.exception{background:#3d1d2b;color:#ff9daf}
+.acceptance-questions ul{margin:0;padding-left:17px;font-size:11px;line-height:1.8;color:#a9b6d2}
+@media(max-width:1100px){.acceptance-grid{grid-template-columns:1fr}.acceptance-input,.acceptance-result{min-height:0}}

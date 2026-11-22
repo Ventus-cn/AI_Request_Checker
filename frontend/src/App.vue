@@ -11,9 +11,14 @@ type Review={id:string;text:string;mode:string;createdAt:string;report:Report;ve
 type HistoryItem={id:string;createdAt:string;summary:string;riskLevel:string;counts:{high:number;medium:number;low:number}}
 type AgentStep={index:number;tool:string;args:string;resultPreview:string;status:string;durationMs:number}
 type AgentRun={taskId:string;status:string;answer:string;steps:AgentStep[];confirm?:{tool:string;impact:string};error?:string}
+type AcceptanceCriterion={id:string;title:string;given:string;when:string;then:string;sourceQuote:string;priority:string}
+type AcceptanceTestSample={id:string;kind:string;input:string;expected:string;sourceQuote:string}
+type AcceptanceReport={summary:string;requirementKind?:string;acceptanceCriteria:AcceptanceCriterion[];testSamples:AcceptanceTestSample[];openQuestions:string[]}
+type AcceptanceChecks={schemaOk:boolean;groundingOk:boolean;structureOk:boolean;coverageOk:boolean;messages:string[]}
+type AcceptanceRun={runId:string;status:string;promptVersion:string;model:string;durationMs:number;usage:{promptTokens:number;completionTokens:number;totalTokens:number};report?:AcceptanceReport;checks?:AcceptanceChecks;attempts?:number;error?:string}
 
 const API=import.meta.env.VITE_API_BASE_URL||'http://localhost:8080/api'
-const page=ref<'home'|'review'|'result'|'history'|'agent'>('home'); const text=ref(''); const mode=ref('全面审查'); const promptVersion=ref('revised'); const loading=ref(false); const uploading=ref(false); const error=ref(''); const fileName=ref(''); const current=ref<Review|null>(null); const history=ref<HistoryItem[]>([]); const filter=ref('all'); const question=ref(''); const selectedIssueId=ref('')
+const page=ref<'home'|'review'|'result'|'history'|'agent'|'acceptance'>('home'); const text=ref(''); const mode=ref('全面审查'); const promptVersion=ref('revised'); const loading=ref(false); const uploading=ref(false); const error=ref(''); const fileName=ref(''); const current=ref<Review|null>(null); const history=ref<HistoryItem[]>([]); const filter=ref('all'); const question=ref(''); const selectedIssueId=ref('')
 const typeNames:Record<string,string>={ambiguous_term:'模糊表达',missing_boundary:'边界缺口',conflict:'需求冲突',permission:'角色权限',testability:'可测试性',security:'安全风险',operational:'运营异常',out_of_scope:'超出任务范围'}
 const visibleIssues=computed(()=>current.value?.report.issues.filter(i=>filter.value==='all'||i.type===filter.value)||[])
 const selectedIssue=computed<Issue|null>(()=>visibleIssues.value.find(i=>i.id===selectedIssueId.value)||visibleIssues.value[0]||null)
@@ -75,6 +80,22 @@ async function decideAgent(run:AgentRun){
     if(r.status==='NEED_CONFIRM')await decideAgent(r)
   }catch(e:any){error.value=e.message}
 }
+const acText=ref(''); const acRun=ref<AcceptanceRun|null>(null); const acLoading=ref(false); const acVersion=ref('revised')
+const acSamples=[
+  {label:'正常需求',text:'用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB。上传后系统解析正文和内嵌图片，解析时间不超过 60 秒。文件超过 10MB 或格式不支持时，页面提示具体原因并拒绝上传。扫描版 PDF 需要调用视觉模型识别，识别失败的页面应在结果中标注未识别范围。'},
+  {label:'信息不足',text:'用户可以上传文件然后得到结果。'},
+  {label:'超出范围',text:'帮我采购 20 台服务器，要求报价最低的供应商，并在本周内完成付款审批。服务器到货后由行政部分配给各项目组。'}
+]
+const acStatus=(s:string)=>s==='SUCCESS'?'已生成':s==='FAILED'?'生成失败':s==='CHECK_FAILED'?'校验未通过':s==='OUT_OF_SCOPE'?'超出范围':s==='REFUSED'?'已拒绝':s
+const acKind=(k?:string)=>k==='insufficient'?'信息不足':k==='out_of_scope'?'超出范围':k==='normal'?'正常需求':'未标注'
+async function generateAcceptance(){
+  if(!acText.value.trim()){error.value='请先输入需求原文';return}
+  if(acText.value.length>3000){error.value='需求文本不能超过 3000 个字符';return}
+  acLoading.value=true;error.value=''
+  try{
+    acRun.value=await request('/acceptance/runs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:acText.value,promptVersion:acVersion.value,mode:acVersion.value==='rule'?'rule':'model'})}) as AcceptanceRun
+  }catch(e:any){error.value=e.message}finally{acLoading.value=false}
+}
 onMounted(loadHistory)
 </script>
 <template>
@@ -85,11 +106,12 @@ onMounted(loadHistory)
     <button class="side-link" :class="{active:page==='review'||page==='result'}" @click="page='review'"><ClipboardCheck :size="17"/><span>新建审查</span><ChevronRight :size="14"/></button>
     <button class="side-link" :class="{active:page==='history'}" @click="page='history';loadHistory()"><History :size="17"/><span>审查档案</span><small>{{history.length}}</small></button>
     <button class="side-link" :class="{active:page==='agent'}" @click="page='agent'"><Sparkles :size="17"/><span>档案分析</span><ChevronRight :size="14"/></button>
+    <button class="side-link" :class="{active:page==='acceptance'}" @click="page='acceptance'"><FileCheck2 :size="17"/><span>验收标准</span><ChevronRight :size="14"/></button>
     <div class="sidebar-divider"></div><div class="sidebar-tip"><Layers3 :size="15"/><div><b>审查工作区</b><span>从原文到可执行证据</span></div></div>
     <div class="sidebar-foot"><div class="status-dot"></div><div><b>本地工作区</b><span>Mock / Qwen 可用</span></div></div>
   </aside>
   <main class="main-shell">
-    <header class="topbar"><div><span class="crumb">{{page==='home'?'REQUIREMENT QUALITY WORKSPACE':'工作区 / '+(page==='history'?'审查档案':page==='result'?'审查 Dashboard':'新建审查')}}</span><h1>{{page==='home'?'AI 需求歧义审查器':page==='history'?'审查档案':page==='result'?'需求质量报告':'开始一次需求审查'}}</h1></div><div class="top-meta"><span class="secure"><CheckCircle2 :size="14"/>后端密钥隔离</span><span class="avatar">AI</span></div></header>
+    <header class="topbar"><div><span class="crumb">{{page==='home'?'REQUIREMENT QUALITY WORKSPACE':'工作区 / '+(page==='history'?'审查档案':page==='result'?'审查 Dashboard':page==='acceptance'?'验收标准生成':'新建审查')}}</span><h1>{{page==='home'?'AI 需求歧义审查器':page==='history'?'审查档案':page==='result'?'需求质量报告':page==='acceptance'?'验收标准生成':'开始一次需求审查'}}</h1></div><div class="top-meta"><span class="secure"><CheckCircle2 :size="14"/>后端密钥隔离</span><span class="avatar">AI</span></div></header>
     <section v-if="page==='home'" class="home-page content">
       <div class="home-hero"><div class="home-copy"><div class="eyebrow"><Sparkles :size="13"/> REQUIREMENT QUALITY WORKSPACE</div><h2>让需求在<br/><span>进入开发前</span>变得清晰</h2><p>把自然语言需求转换为带原文证据、风险分级和可测试验收标准的审查报告。先理解问题，再开始构建。</p><div class="hero-actions"><button class="hero-primary" @click="page='review'">开始一次审查 <ArrowRight :size="16"/></button><button class="hero-secondary" @click="page='history';loadHistory()"><History :size="15"/>查看审查档案</button></div><div class="hero-meta"><span><i class="meta-dot green"></i>Mock 模式无需密钥</span><span><i class="meta-dot blue"></i>支持 DOCX / PDF</span><span><i class="meta-dot purple"></i>报告可继续追问</span></div></div><div class="hero-orbit"><div class="orbit-ring ring-one"></div><div class="orbit-ring ring-two"></div><div class="orbit-core"><ShieldCheck :size="42"/><span>SPEC<br/>LENS</span></div><div class="orbit-node node-one"><CircleAlert :size="14"/>风险</div><div class="orbit-node node-two"><FileCheck2 :size="14"/>证据</div><div class="orbit-node node-three"><BarChart3 :size="14"/>报告</div></div></div>
       <div class="home-section-head"><div><span class="section-kicker">HOW IT WORKS</span><h3>一条清晰的审查路径</h3></div><span>从原文到可执行证据</span></div>
@@ -127,6 +149,59 @@ onMounted(loadHistory)
             <div v-if="agentRun.confirm" class="agent-confirm"><b>等待确认：{{agentRun.confirm.tool}}</b><span>{{agentRun.confirm.impact}}</span></div>
             <h4 class="agent-steps-title">工具轨迹（{{agentRun.steps.length}}）</h4>
             <ul class="agent-steps"><li v-for="(step,i) in agentRun.steps" :key="i"><b :class="step.status">{{step.tool}}</b><span>{{step.resultPreview}}</span><small>{{step.durationMs}} ms</small></li></ul>
+          </template>
+        </div>
+      </div>
+    </section>
+    <section v-else-if="page==='acceptance'" class="content acceptance-page">
+      <div class="page-intro">
+        <div><div class="eyebrow">ACCEPTANCE CRITERIA / CORE AI</div><h2>把需求变成可验收的测试</h2><p>输入一段软件需求，生成带原文引用的验收标准（Given / When / Then）和正常、边界、异常三类测试样例；信息不足或超出范围时给出待确认问题，而不是编造。</p></div>
+        <div class="archive-note"><FileCheck2 :size="16"/><span>{{acVersion==='original'?'初版 Prompt':acVersion==='rule'?'无 AI 基线':'修订版 Prompt'}} · {{acRun?acRun.model:'qwen-plus'}}</span></div>
+      </div>
+      <div class="acceptance-grid">
+        <div class="panel acceptance-input">
+          <div class="card-head"><div><span class="section-kicker">REQUIREMENT INPUT</span><h3>需求原文</h3><p class="card-subtitle">最多 3000 字；每条验收标准都必须能在原文中找到依据。</p></div><button class="ghost" :disabled="acLoading" @click="acText='';acRun=null"><RotateCcw :size="14"/>清空</button></div>
+          <el-input v-model="acText" type="textarea" :rows="13" maxlength="3000" show-word-limit :disabled="acLoading" placeholder="例如：用户可以上传 DOCX 或 PDF 格式的需求文档，单个文件不超过 10MB……"/>
+          <div class="agent-examples"><span>示例：</span><button v-for="s in acSamples" :key="s.label" @click="acText=s.text;acRun=null">{{s.label}}</button></div>
+          <div class="acceptance-config"><label>生成方案</label><el-select v-model="acVersion" :disabled="acLoading"><el-option label="修订版（v2）" value="revised"/><el-option label="初版（v1）" value="original"/><el-option label="无 AI 基线" value="rule"/></el-select></div>
+          <button class="run-btn acceptance-run-btn" :disabled="acLoading" @click="generateAcceptance"><Play :size="16"/>{{acLoading?'生成中…':'生成验收标准'}}</button>
+          <p class="agent-note">运行编号：{{acRun?acRun.runId:'—'}} · 状态：{{acRun?acStatus(acRun.status):'未开始'}} · 耗时 {{acRun?acRun.durationMs:0}} ms</p>
+        </div>
+        <div class="panel acceptance-result">
+          <div class="card-head"><div><span class="section-kicker">VERIFICATION OUTPUT</span><h3>验收标准与测试样例</h3></div><span v-if="acRun" class="status-chip" :class="acRun.status">{{acStatus(acRun.status)}}</span></div>
+          <p v-if="!acRun" class="agent-empty">还没有生成记录。输入需求后点击“生成验收标准”。</p>
+          <template v-else>
+            <p v-if="acRun.error" class="acceptance-error">{{acRun.error}}</p>
+            <div v-if="acRun.checks" class="acceptance-checks">
+              <div :class="{pass:acRun.checks.schemaOk}"><b>结构</b><span>{{acRun.checks.schemaOk?'通过':'未通过'}}</span></div>
+              <div :class="{pass:acRun.checks.groundingOk}"><b>引用</b><span>{{acRun.checks.groundingOk?'可核验':'不可核验'}}</span></div>
+              <div :class="{pass:acRun.checks.structureOk}"><b>GWT</b><span>{{acRun.checks.structureOk?'完整':'有缺项'}}</span></div>
+              <div :class="{pass:acRun.checks.coverageOk}"><b>覆盖</b><span>{{acRun.checks.coverageOk?'正常/边界/异常':'不完整'}}</span></div>
+            </div>
+            <div v-if="acRun.report" class="acceptance-body">
+              <p class="acceptance-summary">{{acRun.report.summary}}</p>
+              <div class="acceptance-meta"><span>类型：{{acKind(acRun.report.requirementKind)}}</span><span>验收标准 {{acRun.report.acceptanceCriteria.length}} 条</span><span>测试样例 {{acRun.report.testSamples.length}} 条</span><span v-if="acRun.usage">Token {{acRun.usage.totalTokens}}</span><span v-if="acRun.attempts">尝试 {{acRun.attempts}} 次</span></div>
+              <div v-if="acRun.report.acceptanceCriteria.length" class="acceptance-list">
+                <article v-for="ac in acRun.report.acceptanceCriteria" :key="ac.id" class="ac-card">
+                  <div class="ac-head"><b>{{ac.id}} · {{ac.title}}</b><span class="ac-priority" :class="ac.priority">{{ac.priority}}</span></div>
+                  <p class="ac-gwt"><span>Given</span>{{ac.given}}</p>
+                  <p class="ac-gwt"><span>When</span>{{ac.when}}</p>
+                  <p class="ac-gwt"><span>Then</span>{{ac.then}}</p>
+                  <p class="ac-quote">“{{ac.sourceQuote}}”</p>
+                </article>
+              </div>
+              <div v-if="acRun.report.testSamples.length" class="acceptance-tests">
+                <h4>测试样例</h4>
+                <article v-for="ts in acRun.report.testSamples" :key="ts.id" class="ts-row">
+                  <span class="kind-badge" :class="ts.kind">{{ts.kind==='normal'?'正常':ts.kind==='boundary'?'边界':'异常'}}</span>
+                  <div><b>{{ts.id}}</b><p>{{ts.input}} → {{ts.expected}}</p></div>
+                </article>
+              </div>
+              <div v-if="acRun.report.openQuestions.length" class="acceptance-questions">
+                <h4>待确认问题</h4>
+                <ul><li v-for="(q,i) in acRun.report.openQuestions" :key="i">{{q}}</li></ul>
+              </div>
+            </div>
           </template>
         </div>
       </div>

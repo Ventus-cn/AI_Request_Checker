@@ -34,3 +34,12 @@ app:
     max-answer-retries: ${AGENT_MAX_ANSWER_RETRIES:2}
     confirm-ttl-ms: ${AGENT_CONFIRM_TTL_MS:300000}
     log-dir: ${AGENT_LOG_DIR:./logs/agent-runs}
+  acceptance:
+    enabled: ${ACCEPTANCE_ENABLED:true}
+    model: ${ACCEPTANCE_MODEL:qwen-plus}
+    temperature: ${ACCEPTANCE_TEMPERATURE:0.2}
+    max-tokens: ${ACCEPTANCE_MAX_TOKENS:2000}
+    timeout-ms: ${ACCEPTANCE_TIMEOUT_MS:60000}
+    max-attempts: ${ACCEPTANCE_MAX_ATTEMPTS:3}
+    max-input-chars: ${ACCEPTANCE_MAX_INPUT_CHARS:3000}
+    log-dir: ${ACCEPTANCE_LOG_DIR:./logs/acceptance-runs}

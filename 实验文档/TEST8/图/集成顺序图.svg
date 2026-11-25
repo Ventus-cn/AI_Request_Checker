@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1560" height="1220" viewBox="0 0 1560 1220">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#1f2937"/></marker>
+    <marker id="arrowWarn" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#b45309"/></marker>
+    <marker id="arrowInfo" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#0e7490"/></marker>
+  </defs>
+  <rect x="0" y="0" width="1560" height="1220" fill="#ffffff"/>
+  <text x="780" y="46" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="24" font-weight="700" fill="#1f2937" text-anchor="middle">图3-1 验收标准生成的集成顺序：界面、任务、状态库、模型与档案库</text>
+  <text x="780" y="78" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13.5" font-weight="400" fill="#4b5563" text-anchor="middle">实线为一次调用；虚线为轮询/重复操作；灰色区间为等待步骤；①—④ 为信任级别发生变化的位置</text>
+  <rect x="18" y="100" width="184" height="52" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.4"/>
+  <text x="110" y="122" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="15.5" font-weight="700" fill="#312e81" text-anchor="middle">用户</text>
+  <text x="110" y="142" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11" font-weight="400" fill="#4b5563" text-anchor="middle">浏览器操作</text>
+  <line x1="110" y1="150" x2="110" y2="1120" stroke="#c7d2fe" stroke-width="1.4" stroke-dasharray="7 7"/>
+  <rect x="268" y="100" width="184" height="52" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.4"/>
+  <text x="360" y="122" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="15.5" font-weight="700" fill="#312e81" text-anchor="middle">前端 Vue</text>
+  <text x="360" y="142" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11" font-weight="400" fill="#4b5563" text-anchor="middle">App.vue 集成面板</text>
+  <line x1="360" y1="150" x2="360" y2="1120" stroke="#c7d2fe" stroke-width="1.4" stroke-dasharray="7 7"/>
+  <rect x="558" y="100" width="184" height="52" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.4"/>
+  <text x="650" y="122" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="15.5" font-weight="700" fill="#312e81" text-anchor="middle">任务接口</text>
+  <text x="650" y="142" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11" font-weight="400" fill="#4b5563" text-anchor="middle">AcceptanceTaskController</text>
+  <line x1="650" y1="150" x2="650" y2="1120" stroke="#c7d2fe" stroke-width="1.4" stroke-dasharray="7 7"/>
+  <rect x="808" y="100" width="184" height="52" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.4"/>
+  <text x="900" y="122" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="15.5" font-weight="700" fill="#312e81" text-anchor="middle">任务状态库</text>
+  <text x="900" y="142" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11" font-weight="400" fill="#4b5563" text-anchor="middle">acceptance_tasks (H2)</text>
+  <line x1="900" y1="150" x2="900" y2="1120" stroke="#c7d2fe" stroke-width="1.4" stroke-dasharray="7 7"/>
+  <rect x="1038" y="100" width="184" height="52" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.4"/>
+  <text x="1130" y="122" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="15.5" font-weight="700" fill="#312e81" text-anchor="middle">模型通道</text>
+  <text x="1130" y="142" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11" font-weight="400" fill="#4b5563" text-anchor="middle">qwen-plus /chat/completions</text>
+  <line x1="1130" y1="150" x2="1130" y2="1120" stroke="#c7d2fe" stroke-width="1.4" stroke-dasharray="7 7"/>
+  <rect x="1298" y="100" width="184" height="52" rx="10" fill="#eef2ff" stroke="#6366f1" stroke-width="1.4"/>
+  <text x="1390" y="122" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="15.5" font-weight="700" fill="#312e81" text-anchor="middle">审查档案库</text>
+  <text x="1390" y="142" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11" font-weight="400" fill="#4b5563" text-anchor="middle">reviews (H2)</text>
+  <line x1="1390" y1="150" x2="1390" y2="1120" stroke="#c7d2fe" stroke-width="1.4" stroke-dasharray="7 7"/>
+  <line x1="110" y1="205" x2="350" y2="205" stroke="#1f2937" stroke-width="1.8"  marker-end="url(#arrow)"/>
+  <text x="235" y="196" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#1f2937" text-anchor="middle">打开审查档案，点击“生成验收标准”</text>
+  <line x1="360" y1="250" x2="640" y2="250" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="505" y="241" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">POST /api/acceptance/tasks {reviewId, promptVersion, mode}</text>
+  <line x1="650" y1="300" x2="1380" y2="300" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="1020" y="291" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">读取档案正文与检索片段快照（只读）</text>
+  <line x1="650" y1="350" x2="890" y2="350" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="775" y="341" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">写入任务：QUEUED + 输入快照（≤3000 字）</text>
+  <line x1="650" y1="400" x2="370" y2="400" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="505" y="391" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">202 Accepted {taskId, status}（立即返回，不等待模型）</text>
+  <line x1="360" y1="455" x2="640" y2="455" stroke="#4b5563" stroke-width="1.8" stroke-dasharray="8 6" marker-end="url(#arrow)"/>
+  <text x="505" y="446" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#4b5563" text-anchor="middle">GET /tasks/{taskId} 轮询（1.2 s）</text>
+  <line x1="650" y1="505" x2="890" y2="505" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="775" y="496" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">更新 RUNNING + phase “调用模型（第 1 次）”</text>
+  <rect x="668" y="540" width="444" height="72" fill="#f3f4f6" stroke="#9ca3af" stroke-dasharray="6 4"/>
+  <text x="890" y="566" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="12.5" font-weight="700" fill="#374151" text-anchor="middle">等待步骤：模型返回前无法获知真实进度</text>
+  <text x="890" y="588" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11.5" font-weight="400" fill="#4b5563" text-anchor="middle">界面只显示“处理中 + 阶段 + 已用时间”，不显示百分比；可取消</text>
+  <line x1="650" y1="630" x2="1120" y2="630" stroke="#b45309" stroke-width="1.8"  marker-end="url(#arrowWarn)"/>
+  <text x="890" y="621" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#b45309" text-anchor="middle">调用模型（读超时 60 s，最多 3 次尝试）</text>
+  <line x1="1130" y1="675" x2="660" y2="675" stroke="#b45309" stroke-width="1.8"  marker-end="url(#arrowWarn)"/>
+  <text x="890" y="666" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#b45309" text-anchor="middle">JSON 文本 + usage（prompt/completion tokens）</text>
+  <path d="M 650 715 h 66 v 34 h -58" fill="none" stroke="#1f2937" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="728" y="731" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="12.5" font-weight="400" fill="#1f2937" text-anchor="start">解析 JSON → 程序检查：结构 / 逐字引用 / GWT / 覆盖</text>
+  <line x1="650" y1="790" x2="890" y2="790" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="775" y="781" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">写入终态 + 结果 + 检查 + 耗时 + 错误码</text>
+  <line x1="650" y1="835" x2="370" y2="835" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="505" y="826" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">下一次轮询返回 已生成 / 生成失败 / 已拒绝 / 已取消</text>
+  <line x1="360" y1="880" x2="120" y2="880" stroke="#1f2937" stroke-width="1.8"  marker-end="url(#arrow)"/>
+  <text x="235" y="871" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#1f2937" text-anchor="middle">展示结果与检查项：AI 生成，需人工核验</text>
+  <line x1="110" y1="930" x2="350" y2="930" stroke="#1f2937" stroke-width="1.8"  marker-end="url(#arrow)"/>
+  <text x="235" y="921" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#1f2937" text-anchor="middle">编辑 / 保存到档案 / 重新生成 / 规则流程 / 转人工 / 放弃</text>
+  <line x1="360" y1="975" x2="640" y2="975" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="505" y="966" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">PUT /tasks/{id}/result 或 POST /tasks/{id}/apply</text>
+  <line x1="650" y1="1020" x2="890" y2="1020" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="775" y="1011" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">保存：edited / decision=ACCEPTED / appliedAt</text>
+  <line x1="650" y1="1065" x2="1380" y2="1065" stroke="#0e7490" stroke-width="1.8"  marker-end="url(#arrowInfo)"/>
+  <text x="1020" y="1056" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="400" fill="#0e7490" text-anchor="middle">写 review.acceptanceJson（仅用户确认后，幂等）</text>
+  <circle cx="650" cy="250" r="14" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+  <text x="650" y="255" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="700" fill="#92400e" text-anchor="middle">①</text>
+  <text x="672" y="255" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11.5" font-weight="400" fill="#92400e" text-anchor="start">用户输入进入后端：长度/范围/权限由后端检查</text>
+  <circle cx="1390" cy="320" r="14" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+  <text x="1390" y="325" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="700" fill="#92400e" text-anchor="middle">②</text>
+  <text x="1368" y="325" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11.5" font-weight="400" fill="#92400e" text-anchor="end">档案正文进入模型上下文：原文只当数据</text>
+  <circle cx="1130" cy="700" r="14" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+  <text x="1130" y="705" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="700" fill="#92400e" text-anchor="middle">③</text>
+  <text x="1108" y="705" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11.5" font-weight="400" fill="#92400e" text-anchor="end">模型输出进入系统：先解析与检查再展示</text>
+  <circle cx="1390" cy="1095" r="14" fill="#fef3c7" stroke="#b45309" stroke-width="1.6"/>
+  <text x="1390" y="1100" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="13" font-weight="700" fill="#92400e" text-anchor="middle">④</text>
+  <text x="1368" y="1100" font-family="Microsoft YaHei, SimHei, sans-serif" font-size="11.5" font-weight="400" fill="#92400e" text-anchor="end">写档案：需状态 SUCCEEDED 且用户确认</text>
+</svg>

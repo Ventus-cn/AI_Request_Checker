@@ -15,6 +15,9 @@ import java.util.regex.Pattern;
 /**
  * 端到端主链路：输入规范化 → 需求类型判定 → 模型调用 → 解析 → 程序检查 → 有限修复 → 返回。
  * revised 版本启用程序检查与修复；original 版本保留 v1 的单次调用行为，便于同测试集复现。
+ *
+ * <p>带 {@link AcceptanceContext} 的调用用于集成层：在每个阶段边界检查取消信号并回报阶段，
+ * 取消后即使模型返回也丢弃结果（迟到结果不写入任务）。</p>
  */
 @Service
 public class AcceptanceService {
@@ -39,7 +42,16 @@ public class AcceptanceService {
     this.checker = checker;
   }
 
+  public String modelName() {
+    return props.getModel();
+  }
+
   public RunResponse run(RunRequest request) {
+    return run(request, AcceptanceContext.none());
+  }
+
+  /** 带任务上下文的运行：允许在阶段边界检查取消并回报阶段。 */
+  public RunResponse run(RunRequest request, AcceptanceContext ctx) {
     String text = normalize(request == null ? null : request.text());
     if (text.isBlank()) throw new IllegalArgumentException("需求文本不能为空");
     if (text.length() > props.getMaxInputChars()) {
@@ -52,36 +64,50 @@ public class AcceptanceService {
 
     logger.event(runId, 0, "context", Map.of(
         "version", version, "mode", rule ? "rule" : "model",
-        "model", rule ? "none" : props.getModel(),
-        "inputChars", text.length(), "inputPreview", preview(text, 80)));
+        "model", modelName(rule),
+        "inputChars", text.length(), "inputPreview", preview(text, 80),
+        "taskId", ctx.taskId() == null ? "" : ctx.taskId()
+    ));
+
+    if (ctx.isCancelled()) {
+      logger.event(runId, 0, "cancel", Map.of("status", "CANCELLED", "stage", "before-start"));
+      return cancelled(runId, version, rule, 0, started, 0, 0);
+    }
 
     if (rule) {
+      ctx.reportPhase("规则流程");
       Report report = RuleBaseline.build(text);
       long duration = System.currentTimeMillis() - started;
       logger.event(runId, 0, "finish", Map.of("status", "SUCCESS", "durationMs", duration,
           "criteria", report.acceptanceCriteria().size()));
       logger.artifact(runId, artifact(runId, version, "rule", text, List.of(), report, null, 1, duration, 0, 0));
       return new RunResponse(runId, "SUCCESS", version, "rule-baseline", duration,
-          new Usage(0, 0, 0), report, null, 1, null);
+          new Usage(0, 0, 0), report, null, 1, null, null);
     }
 
-    if ("original".equals(version)) return singleCall(runId, text, version, started);
-    return revisedRun(runId, text, version, started);
+    if ("original".equals(version)) return singleCall(runId, text, version, started, ctx);
+    return revisedRun(runId, text, version, started, ctx);
   }
 
   /** v1 行为：单次模型调用、只解析 JSON，不做程序检查与修复。 */
-  private RunResponse singleCall(String runId, String text, String version, long started) {
+  private RunResponse singleCall(String runId, String text, String version, long started, AcceptanceContext ctx) {
     String system = prompts.load(version);
     List<Map<String, String>> messages = new ArrayList<>();
     messages.add(Map.of("role", "system", "content", system));
     messages.add(Map.of("role", "user", "content", "需求原文：\n" + text));
     logger.event(runId, 1, "model", Map.of("status", "start", "promptVersion", version));
+    ctx.reportPhase("调用模型");
 
     AcceptanceModelClient.ChatResult result;
     try {
       result = modelClient.chat(messages);
     } catch (Exception e) {
-      return failed(runId, text, version, started, 1, "模型调用失败：" + rootMessage(e), List.of());
+      return failed(runId, text, version, started, 1, modelFailureMessage(e),
+          errorCodeOf(e), List.of());
+    }
+    if (ctx.isCancelled()) {
+      logger.event(runId, 1, "cancel", Map.of("status", "CANCELLED", "stage", "after-model", "lateResult", true));
+      return cancelled(runId, version, false, 1, started, result.promptTokens(), result.completionTokens());
     }
     Report report;
     try {
@@ -89,7 +115,7 @@ public class AcceptanceService {
     } catch (Exception e) {
       String message = "输出不是合法 JSON：" + rootMessage(e);
       logger.event(runId, 1, "parse", Map.of("status", "error", "errorType", "PARSE_ERROR", "message", preview(message, 200)));
-      return failed(runId, text, version, started, 1, message,
+      return failed(runId, text, version, started, 1, message, "OUTPUT_INVALID",
           List.of(new Attempt(1, result.content(), null)));
     }
     long duration = result.durationMs() > 0 ? result.durationMs() : System.currentTimeMillis() - started;
@@ -101,11 +127,12 @@ public class AcceptanceService {
         result.promptTokens(), result.completionTokens()));
     return new RunResponse(runId, "SUCCESS", version, props.getModel(), duration,
         new Usage(result.promptTokens(), result.completionTokens(),
-            result.promptTokens() + result.completionTokens()), report, null, 1, null);
+            result.promptTokens() + result.completionTokens()), report, null, 1, null, null);
   }
 
   /** v2 修订版：范围预检 + 模型调用 + 程序检查 + 有限修复。 */
-  private RunResponse revisedRun(String runId, String text, String version, long started) {
+  private RunResponse revisedRun(String runId, String text, String version, long started, AcceptanceContext ctx) {
+    ctx.reportPhase("范围预检");
     if (OUT_OF_SCOPE.matcher(text).find()) {
       Report report = new Report("out_of_scope",
           "当前输入不是软件需求，已拒绝生成验收标准。",
@@ -119,7 +146,7 @@ public class AcceptanceService {
       logger.event(runId, 0, "finish", Map.of("status", "REFUSED", "durationMs", duration));
       logger.artifact(runId, artifact(runId, version, "model", text, List.of(), report, checks, 0, duration, 0, 0));
       return new RunResponse(runId, "REFUSED", version, props.getModel(), duration,
-          new Usage(0, 0, 0), report, checks, 0, null);
+          new Usage(0, 0, 0), report, checks, 0, null, "SCOPE_REJECTED");
     }
 
     String system = prompts.load(version);
@@ -134,19 +161,32 @@ public class AcceptanceService {
     Report report = null;
     Checks checks = null;
     String lastError = null;
+    String errorCode = null;
 
     for (int attempt = 1; attempt <= props.getMaxAttempts(); attempt++) {
+      if (ctx.isCancelled()) {
+        logger.event(runId, attempt, "cancel", Map.of("status", "CANCELLED", "stage", "before-attempt"));
+        return cancelled(runId, version, false, attempt - 1, started, promptTokens, completionTokens);
+      }
       logger.event(runId, attempt, "model", Map.of("status", "start", "promptVersion", version,
           "messages", messages.size()));
+      ctx.reportPhase("调用模型（第 " + attempt + " 次）");
       AcceptanceModelClient.ChatResult result;
       try {
         result = modelClient.chat(messages);
       } catch (Exception e) {
-        lastError = "模型调用失败：" + rootMessage(e);
+        lastError = modelFailureMessage(e);
+        errorCode = errorCodeOf(e);
         logger.event(runId, attempt, "model", Map.of("status", "error",
-            "errorType", "MODEL_ERROR", "message", preview(lastError, 200)));
-        return failedWith(runId, text, version, started, attempt, attempts, lastError,
+            "errorType", "MODEL_ERROR", "errorCode", errorCode, "message", preview(lastError, 200)));
+        return failedWith(runId, text, version, started, attempt, attempts, lastError, errorCode,
             promptTokens, completionTokens, totalMs);
+      }
+      if (ctx.isCancelled()) {
+        logger.event(runId, attempt, "cancel", Map.of("status", "CANCELLED",
+            "stage", "after-model", "lateResult", true, "durationMs", result.durationMs()));
+        return cancelled(runId, version, false, attempt, started,
+            promptTokens + result.promptTokens(), completionTokens + result.completionTokens());
       }
       promptTokens += result.promptTokens();
       completionTokens += result.completionTokens();
@@ -159,6 +199,7 @@ public class AcceptanceService {
         report = parseReport(result.content());
       } catch (Exception e) {
         lastError = "输出不是合法 JSON：" + rootMessage(e);
+        errorCode = "OUTPUT_INVALID";
         attempts.add(new Attempt(attempt, result.content(), null));
         logger.event(runId, attempt, "parse", Map.of("status", "error",
             "errorType", "PARSE_ERROR", "message", preview(lastError, 160)));
@@ -170,16 +211,22 @@ public class AcceptanceService {
           logger.event(runId, attempt, "repair", Map.of("status", "start", "reason", "PARSE_ERROR"));
           continue;
         }
-        return failedWith(runId, text, version, started, attempt, attempts, lastError,
+        return failedWith(runId, text, version, started, attempt, attempts, lastError, errorCode,
             promptTokens, completionTokens, totalMs);
       }
 
+      ctx.reportPhase("程序检查（第 " + attempt + " 次）");
       checks = checker.check(text, report);
       attempts.add(new Attempt(attempt, result.content(), checks));
       logger.event(runId, attempt, "check", Map.of("status", checks.acceptable() ? "ok" : "error",
           "schemaOk", checks.schemaOk(), "groundingOk", checks.groundingOk(),
           "structureOk", checks.structureOk(), "coverageOk", checks.coverageOk(),
           "messages", String.join("；", checks.messages())));
+
+      if (ctx.isCancelled()) {
+        logger.event(runId, attempt, "cancel", Map.of("status", "CANCELLED", "stage", "after-check"));
+        return cancelled(runId, version, false, attempt, started, promptTokens, completionTokens);
+      }
 
       if (checks.acceptable()) {
         long duration = totalMs > 0 ? totalMs : System.currentTimeMillis() - started;
@@ -188,7 +235,7 @@ public class AcceptanceService {
             attempt, duration, promptTokens, completionTokens));
         return new RunResponse(runId, "SUCCESS", version, props.getModel(), duration,
             new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
-            report, checks, attempt, null);
+            report, checks, attempt, null, null);
       }
 
       if (attempt < props.getMaxAttempts()) {
@@ -197,6 +244,7 @@ public class AcceptanceService {
         logger.event(runId, attempt, "repair", Map.of("status", "start",
             "reason", preview(String.join("；", checks.messages()), 200)));
         lastError = String.join("；", checks.messages());
+        errorCode = "CHECK_FAILED";
       }
     }
 
@@ -207,7 +255,20 @@ public class AcceptanceService {
     return new RunResponse(runId, "CHECK_FAILED", version, props.getModel(), duration,
         new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
         report, checks, props.getMaxAttempts(),
-        "结果未通过程序检查：" + (lastError == null ? "未知原因" : lastError));
+        "结果未通过程序检查：" + (lastError == null ? "未知原因" : lastError), "CHECK_FAILED");
+  }
+
+  private RunResponse cancelled(String runId, String version, boolean rule, int attempts, long started,
+                                int promptTokens, int completionTokens) {
+    long duration = System.currentTimeMillis() - started;
+    logger.event(runId, attempts, "finish", Map.of("status", "CANCELLED", "durationMs", duration));
+    return new RunResponse(runId, "CANCELLED", version, modelName(rule), duration,
+        new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
+        null, null, attempts, "任务已取消，返回结果已丢弃", "CANCELLED");
+  }
+
+  private String modelName(boolean rule) {
+    return rule ? "rule-baseline" : props.getModel();
   }
 
   private String repairInstruction(List<String> messages) {
@@ -218,25 +279,49 @@ public class AcceptanceService {
   }
 
   private RunResponse failed(String runId, String text, String version, long started,
-                             int attempts, String message, List<Attempt> attemptList) {
+                             int attempts, String message, String errorCode, List<Attempt> attemptList) {
     long duration = System.currentTimeMillis() - started;
-    logger.event(runId, attempts, "finish", Map.of("status", "FAILED", "durationMs", duration));
+    logger.event(runId, attempts, "finish", Map.of("status", "FAILED", "durationMs", duration,
+        "errorCode", errorCode == null ? "" : errorCode));
     logger.artifact(runId, artifact(runId, version, "model", text, attemptList, null, null,
         attempts, duration, 0, 0));
     return new RunResponse(runId, "FAILED", version, props.getModel(), duration,
-        new Usage(0, 0, 0), null, null, attempts, message);
+        new Usage(0, 0, 0), null, null, attempts, message, errorCode);
   }
 
   private RunResponse failedWith(String runId, String text, String version, long started, int attempts,
-                                 List<Attempt> attemptList, String message,
+                                 List<Attempt> attemptList, String message, String errorCode,
                                  int promptTokens, int completionTokens, long totalMs) {
     long duration = totalMs > 0 ? totalMs : System.currentTimeMillis() - started;
-    logger.event(runId, attempts, "finish", Map.of("status", "FAILED", "durationMs", duration));
+    logger.event(runId, attempts, "finish", Map.of("status", "FAILED", "durationMs", duration,
+        "errorCode", errorCode == null ? "" : errorCode));
     logger.artifact(runId, artifact(runId, version, "model", text, attemptList, null, null,
         attempts, duration, promptTokens, completionTokens));
     return new RunResponse(runId, "FAILED", version, props.getModel(), duration,
         new Usage(promptTokens, completionTokens, promptTokens + completionTokens),
-        null, null, attempts, message);
+        null, null, attempts, message, errorCode);
+  }
+
+  /** 模型通道已经把“模型调用失败”写进消息，这里避免重复前缀。 */
+  private String modelFailureMessage(Throwable e) {
+    String message = rootMessage(e);
+    return message.startsWith("模型调用失败") ? message : "模型调用失败：" + message;
+  }
+
+  /** 把模型通道异常归一到有限错误码，供前端给出不同提示与可选操作。 */
+  private String errorCodeOf(Throwable e) {
+    String message = rootMessage(e).toLowerCase(Locale.ROOT);
+    Throwable cause = e.getCause();
+    String causeMessage = cause == null ? "" : String.valueOf(cause.getMessage()).toLowerCase(Locale.ROOT);
+    String merged = message + " " + causeMessage;
+    if (merged.contains("timed out") || merged.contains("timeout") || merged.contains("超时")) {
+      return "MODEL_TIMEOUT";
+    }
+    if (merged.contains("未配置") || merged.contains("api key") || merged.contains("unauthorized")
+        || merged.contains("401")) {
+      return "MODEL_UNAVAILABLE";
+    }
+    return "MODEL_ERROR";
   }
 
   private Map<String, Object> artifact(String runId, String version, String mode, String text,
@@ -317,7 +402,7 @@ public class AcceptanceService {
         .replaceAll("\n{3,}", "\n\n").trim();
   }
 
-  private String rootMessage(Exception e) {
+  private String rootMessage(Throwable e) {
     String message = e.getMessage();
     if (message == null || message.isBlank()) return e.getClass().getSimpleName();
     return message.length() > 300 ? message.substring(0, 300) : message;

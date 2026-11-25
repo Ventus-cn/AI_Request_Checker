@@ -13,7 +13,14 @@ public class Review {
   private Instant createdAt;
   @Column(columnDefinition="TEXT") private String reportJson;
   @Column(columnDefinition="TEXT") private String versionsJson;
+  /** 用户确认保存的验收标准（实验8 集成结果）；删除档案时一并删除。 */
+  @Column(columnDefinition="TEXT") private String acceptanceJson;
+  private String acceptanceTaskId;
+  private Instant acceptanceSavedAt;
   protected Review() {}
   public Review(String text, String mode, String reportJson) { this.text=text; this.mode=mode; this.reportJson=reportJson; this.createdAt=Instant.now(); this.versionsJson="[]"; }
   public UUID getId(){return id;} public String getText(){return text;} public String getMode(){return mode;} public Instant getCreatedAt(){return createdAt;} public String getReportJson(){return reportJson;} public void setReportJson(String v){reportJson=v;} public String getVersionsJson(){return versionsJson;} public void setVersionsJson(String v){versionsJson=v;}
+  public String getAcceptanceJson(){return acceptanceJson;} public void setAcceptanceJson(String v){acceptanceJson=v;}
+  public String getAcceptanceTaskId(){return acceptanceTaskId;} public void setAcceptanceTaskId(String v){acceptanceTaskId=v;}
+  public Instant getAcceptanceSavedAt(){return acceptanceSavedAt;} public void setAcceptanceSavedAt(Instant v){acceptanceSavedAt=v;}
 }

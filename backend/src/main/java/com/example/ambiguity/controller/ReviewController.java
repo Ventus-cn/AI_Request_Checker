@@ -20,6 +20,7 @@ public class ReviewController {
   @PostMapping("/{id}/follow-up") public ReviewResponse follow(@PathVariable UUID id,@RequestBody FollowUpRequest req){if(req==null||req.question()==null||req.question().isBlank())throw new IllegalArgumentException("追问内容不能为空");return reviews.follow(id,req.question());}
   @GetMapping public List<HistoryItem> history(){return reviews.history();}
   @GetMapping("/{id}") public ReviewResponse get(@PathVariable UUID id){return reviews.get(id);}
+  @GetMapping("/{id}/acceptance") public Map<String,Object> acceptance(@PathVariable UUID id){return reviews.getAcceptance(id);}
   @GetMapping(value="/{id}/report.pdf", produces=MediaType.APPLICATION_PDF_VALUE)
   public ResponseEntity<byte[]> export(@PathVariable UUID id) throws Exception {
     byte[] bytes = pdf.export(reviews.get(id));

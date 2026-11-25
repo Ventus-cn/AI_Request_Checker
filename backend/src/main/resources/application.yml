@@ -43,3 +43,10 @@ app:
     max-attempts: ${ACCEPTANCE_MAX_ATTEMPTS:3}
     max-input-chars: ${ACCEPTANCE_MAX_INPUT_CHARS:3000}
     log-dir: ${ACCEPTANCE_LOG_DIR:./logs/acceptance-runs}
+  integration:
+    enabled: ${INTEGRATION_ENABLED:true}
+    executor-core: ${INTEGRATION_EXECUTOR_CORE:2}
+    executor-max: ${INTEGRATION_EXECUTOR_MAX:4}
+    queue-capacity: ${INTEGRATION_QUEUE_CAPACITY:20}
+    retention-days: ${INTEGRATION_RETENTION_DAYS:30}
+    cleanup-interval-ms: ${INTEGRATION_CLEANUP_INTERVAL_MS:3600000}

@@ -40,6 +40,24 @@ public class ReviewService {
     try {List<Map<String,Object>> versions=mapper.readValue(r.getVersionsJson(),new TypeReference<>(){}); versions.add(mapper.readValue(r.getReportJson(),new TypeReference<>(){})); r.setVersionsJson(mapper.writeValueAsString(versions)); r.setReportJson(mapper.writeValueAsString(report)); Review saved=repo.save(r); log.info("review.follow_up id={} versions={}", id, versions.size()); return response(saved);}catch(Exception e){log.error("review.follow_up_failed id={}",id,e); throw new IllegalStateException("保存追问版本失败");}}
   public List<HistoryItem> history(){ return repo.findAll().stream().sorted(Comparator.comparing(Review::getCreatedAt).reversed()).map(r->{try{Map<String,Object> p=mapper.readValue(r.getReportJson(),new TypeReference<>(){});return new HistoryItem(r.getId().toString(),r.getCreatedAt().toString(),r.getText().replaceAll("\\s+"," ").substring(0,Math.min(90,r.getText().replaceAll("\\s+"," ").length())),String.valueOf(p.getOrDefault("riskLevel","low")),(Map<String,Object>)p.getOrDefault("counts",Map.of()));}catch(Exception e){return new HistoryItem(r.getId().toString(),r.getCreatedAt().toString(),r.getText(),"unknown",Map.of());}}).collect(Collectors.toList()); }
   public ReviewResponse get(UUID id){return response(repo.findById(id).orElseThrow(()->new NoSuchElementException("审查记录不存在")));}
+  /** 取原始档案，供集成层读取正文与检索来源。 */
+  public Review find(UUID id){ return repo.findById(id).orElseThrow(()->new NoSuchElementException("审查记录不存在")); }
+  /** 保存用户确认的验收标准；同一档案重复保存时覆盖为最新版本。 */
+  public void saveAcceptance(UUID id, String acceptanceJson){
+    Review r = find(id);
+    r.setAcceptanceJson(acceptanceJson);
+    r.setAcceptanceSavedAt(java.time.Instant.now());
+    try { r.setAcceptanceTaskId(mapper.readTree(acceptanceJson).path("acceptance").path("taskId").asText(null)); } catch (Exception ignored) { }
+    repo.save(r);
+    log.info("acceptance.saved review={} chars={}", id, acceptanceJson == null ? 0 : acceptanceJson.length());
+  }
+  /** 读取已保存的验收标准；没有时返回 saved=false，便于前端区分“从未保存”和“保存失败”。 */
+  public Map<String,Object> getAcceptance(UUID id){
+    Review r = find(id);
+    if (r.getAcceptanceJson() == null) return Map.of("saved", false);
+    try { return mapper.readValue(r.getAcceptanceJson(), new TypeReference<>(){}); }
+    catch (Exception e) { throw new IllegalStateException("验收标准解析失败"); }
+  }
   public void delete(UUID id){ if (!repo.existsById(id)) throw new NoSuchElementException("审查记录不存在"); repo.deleteById(id); log.info("review.deleted id={}",id); }
   private String normalizePromptVersion(String value){ if ("original".equalsIgnoreCase(value) || "原Prompt".equals(value)) return "original"; return "revised"; }
   private Map<String,Object> readReport(String json){ try{return mapper.readValue(json,new TypeReference<>(){});}catch(Exception e){throw new IllegalStateException("审查报告解析失败");} }

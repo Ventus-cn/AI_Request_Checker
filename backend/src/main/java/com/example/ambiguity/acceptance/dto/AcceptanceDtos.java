@@ -27,7 +27,12 @@ public final class AcceptanceDtos {
     }
   }
 
+  /**
+   * errorCode 与任务层共用同一套错误码：
+   * INPUT_INVALID / SCOPE_REJECTED / MODEL_TIMEOUT / MODEL_UNAVAILABLE / MODEL_ERROR /
+   * OUTPUT_INVALID / CHECK_FAILED / CANCELLED。
+   */
   public record RunResponse(String runId, String status, String promptVersion, String model,
                             long durationMs, Usage usage, Report report, Checks checks,
-                            int attempts, String error) {}
+                            int attempts, String error, String errorCode) {}
 }

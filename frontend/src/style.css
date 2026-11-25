@@ -74,3 +74,50 @@
 .acceptance-questions ul{margin:0;padding-left:17px;font-size:11px;line-height:1.8;color:#a9b6d2}
 @media(max-width:1100px){.acceptance-grid{grid-template-columns:1fr}.acceptance-input,.acceptance-result{min-height:0}}
 .status-chip.REFUSED{background:#44351b;color:#ffd483;border-color:#8e6b35}
+
+/* ===== 实验8：AI 能力集成（任务状态、降级、人工处理） ===== */
+.acceptance-integration{margin-top:18px;padding:22px}
+.integration-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.integration-head h3{margin:2px 0 4px;font-size:15px}
+.integration-head p{margin:0;font-size:11px;line-height:1.7;color:#93a0bd;max-width:760px}
+.integration-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:14px 0 8px}
+.integration-run{min-width:170px;justify-content:center}
+.integration-task{font-size:10px;color:#7f8cab}
+.integration-hint{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffd483;background:#3a2f18;border:1px solid #7d6431;border-radius:8px;padding:8px 10px;margin:6px 0}
+.integration-notice{font-size:11px;color:#9fd4ff;background:#152a40;border:1px solid #2d5a80;border-radius:8px;padding:8px 10px;margin:8px 0}
+.integration-error{display:flex;flex-direction:column;gap:8px}
+.error-actions{display:flex;gap:8px;flex-wrap:wrap}
+.degraded-banner{display:flex;gap:10px;align-items:baseline;font-size:11px;line-height:1.6;color:#ffd483;background:#3a2f18;border:1px solid #7d6431;border-radius:8px;padding:9px 12px;margin:8px 0}
+.degraded-banner b{color:#ffe6a8}
+.uncertain-banner{display:flex;gap:8px;align-items:flex-start;font-size:11px;line-height:1.65;color:#c9d3ea;background:#1a2340;border:1px solid #34406b;border-radius:8px;padding:9px 12px;margin:8px 0}
+.integration-result{margin-top:6px}
+.integration-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid #202943}
+.saved-note{display:flex;align-items:center;gap:6px;font-size:10.5px;color:#6de0b2;margin:8px 0 0}
+.integration-saved{margin-top:10px}
+.integration-sources{margin-top:14px;padding-top:12px;border-top:1px solid #202943}
+.integration-sources ul{margin:6px 0;padding-left:16px;font-size:10.5px;line-height:1.8;color:#a9b6d2}
+.integration-sources p{font-size:10px;color:#7180a4;margin:4px 0 0}
+.integration-sources.muted{font-size:10.5px;color:#7180a4}
+.integration-history{margin-top:14px;padding-top:12px;border-top:1px solid #202943}
+.task-row{display:flex;align-items:center;gap:10px;width:100%;background:#101a2f;border:1px solid #2a3552;border-radius:8px;padding:8px 10px;margin-top:6px;cursor:pointer;color:#c9d3ea;text-align:left}
+.task-row:hover{border-color:#4a3f8f}
+.task-row.active{border-color:#8b5cf6;background:#191d3a}
+.task-status{font-size:9px;padding:3px 7px;border-radius:10px;background:#29245a;color:#c0b5ff;white-space:nowrap}
+.task-status.SUCCEEDED{background:#123c38;color:#6de0b2}
+.task-status.FAILED,.task-status.CHECK_FAILED{background:#461f37;color:#ff91a2}
+.task-status.RUNNING,.task-status.QUEUED{background:#44351b;color:#ffd483}
+.task-status.CANCELLED{background:#2a3048;color:#9aa7c4}
+.task-status.REFUSED{background:#44351b;color:#ffd483}
+.task-id{font-family:Consolas,monospace;font-size:10px;color:#9fb0d8}
+.task-meta{margin-left:auto;font-size:9.5px;color:#7f8cab}
+.acceptance-edit{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.acceptance-edit>label{font-size:10px;color:#8290ab;margin-top:4px}
+.edit-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.edit-toolbar b{font-size:12px;color:#e6ecfb}
+.edit-toolbar>div{display:flex;gap:8px}
+.edit-grid{border:1px solid #2a3552;background:#101a2f;border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.edit-card-head{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#c9d3ea}
+.edit-row{display:grid;grid-template-columns:110px minmax(0,1fr) 120px;gap:6px}
+.check-messages{font-size:10px;line-height:1.6;color:#ff9daf;margin:2px 0 8px}
+.ac-quote.unverified{border-left-color:#ff6b81;background:#3a1c2a;color:#ffc2cd}
+.ghost.danger{color:#ff91a2;border-color:#8d3f5d}

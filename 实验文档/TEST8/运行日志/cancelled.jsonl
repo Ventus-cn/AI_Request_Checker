@@ -1,0 +1,4 @@
+{"runId":"20261125-100339-427a2b","ts":"2026-11-25T10:03:39.781763800+08:00","attempt":0,"phase":"context","inputPreview":"管理员可以按风险等级筛选审查档案，并导出当前版本的 PDF 报告。导出不调用模型，超过 200 条档案时提示缩小筛选范围。普通用户只能查看本人创建的档案，删除档…","model":"qwen-plus","taskId":"AC20261125100339-fdb5","mode":"model","version":"revised","inputChars":96}
+{"runId":"20261125-100339-427a2b","ts":"2026-11-25T10:03:39.815753900+08:00","attempt":1,"phase":"model","messages":2,"status":"start","promptVersion":"revised"}
+{"runId":"20261125-100339-427a2b","ts":"2026-11-25T10:04:05.287843+08:00","attempt":1,"phase":"cancel","status":"CANCELLED","lateResult":true,"durationMs":25458,"stage":"after-model"}
+{"runId":"20261125-100339-427a2b","ts":"2026-11-25T10:04:05.290998700+08:00","attempt":1,"phase":"finish","status":"CANCELLED","durationMs":25509}

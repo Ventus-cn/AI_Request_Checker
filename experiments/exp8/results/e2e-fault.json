@@ -1,0 +1,42 @@
+[
+  {
+    "id": "E2E-12",
+    "title": "模型不可用：提示错误码并可规则降级后保存",
+    "preconditions": "后端以 AI_MODE=qwen、无 DASHSCOPE_API_KEY 启动",
+    "steps": "打开档案 → 生成 → 规则流程 → 保存到档案",
+    "expected": "任务失败并给出 MODEL_UNAVAILABLE 与重试/规则/人工入口；规则结果显示非 AI 标注并可保存",
+    "actual": "任务 AC20261124230444-6c7f MODEL_UNAVAILABLE；规则任务 AC20261124230447-ae23 degraded=true、model=rule-baseline；已保存到档案",
+    "status": "PASS",
+    "evidence": [
+      "图3-17-模型不可用.png",
+      "图3-18-规则降级.png"
+    ],
+    "at": "2026-11-24T15:04:50.079Z"
+  },
+  {
+    "id": "E2E-13",
+    "title": "模型超时：真实读超时被识别为 MODEL_TIMEOUT",
+    "preconditions": "后端 ACCEPTANCE_TIMEOUT_MS=1，Key 正常",
+    "steps": "打开档案 → 生成 → 等待失败",
+    "expected": "任务为生成失败，错误码 MODEL_TIMEOUT，页面给出重试/规则/人工入口",
+    "actual": "任务 AC20261124231140-19fd MODEL_TIMEOUT：模型调用失败：I/O error on POST request for \"https://dashscope.aliyuncs.com/compatible-",
+    "status": "PASS",
+    "evidence": [
+      "图3-19-模型超时.png"
+    ],
+    "at": "2026-11-24T15:11:43.154Z"
+  },
+  {
+    "id": "E2E-14",
+    "title": "服务重启：任务状态与已保存结果仍可恢复",
+    "preconditions": "后端恢复正常配置并重启",
+    "steps": "重启后查询任务 → 重新打开档案",
+    "expected": "任务状态、错误码、保存标记与已保存结果与重启前一致",
+    "actual": "降级任务 AC20261124230447-ae23 仍为已保存；超时任务 AC20261124231140-19fd 仍为 FAILED/MODEL_TIMEOUT；档案页恢复已保存结果",
+    "status": "PASS",
+    "evidence": [
+      "图3-20-重启后恢复.png"
+    ],
+    "at": "2026-11-24T15:15:41.036Z"
+  }
+]

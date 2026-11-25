@@ -1,0 +1,167 @@
+{
+  "runAt": "2026-11-25T02:06:41.784Z",
+  "totalMs": 348730,
+  "passed": 11,
+  "failed": 0,
+  "cases": [
+    {
+      "id": "E2E-01",
+      "title": "正常主流程：档案入口生成验收标准并保存",
+      "preconditions": "正常需求的审查档案已存在；前后端与 qwen-plus 可用",
+      "steps": "打开档案 → 点击“生成验收标准” → 观察处理中 → 等待已生成 → 核对检查项 → 保存到档案 → 刷新后重新打开档案",
+      "expected": "任务经历排队/处理中到已生成；检查项四项通过；结果保存到档案，刷新后仍可读取",
+      "actual": "任务 AC20261125100230-070d 成功，5 条标准/3 个样例，耗时 28687 ms，四项检查通过，已保存并在刷新后恢复",
+      "status": "PASS",
+      "evidence": [
+        "图3-1-集成入口.png",
+        "图3-2-处理中.png",
+        "图3-3-生成完成与检查.png",
+        "图3-4-保存到档案.png",
+        "图3-5-重新打开档案已保存.png"
+      ],
+      "startedAt": 1795572146760,
+      "durationMs": 41161
+    },
+    {
+      "id": "E2E-02",
+      "title": "重复提交：按钮禁用且接口返回同一任务",
+      "preconditions": "档案 E2E-01 已打开，可以再次生成",
+      "steps": "点击生成 → 立即再次点击（界面）→ 直接向接口重复提交同一档案",
+      "expected": "处理中按钮不可点击；接口重复提交返回同一任务编号并标记 duplicate=true；任务数量不增加",
+      "actual": "按钮禁用；接口返回同一任务 AC20261125100310-d5f6（duplicate=true），任务数 1→2",
+      "status": "PASS",
+      "evidence": [
+        "图3-6-重复提交.png"
+      ],
+      "startedAt": 1795572187922,
+      "durationMs": 29223
+    },
+    {
+      "id": "E2E-03",
+      "title": "取消任务：处理中取消，迟到结果被丢弃",
+      "preconditions": "档案 B 尚未生成过验收标准",
+      "steps": "打开档案 B → 生成 → 处理中点击取消 → 等待终态 → 再等待 5 秒复查",
+      "expected": "状态先显示“正在取消”，随后为“已取消”；结果为空；模型迟到返回的结果不覆盖已取消状态",
+      "actual": "任务 AC20261125100339-fdb5 取消成功：阶段“任务 AC20261125100339-fdb5 · 正在取消（等待当前调用返回） · 3 秒”，终态已取消，等待 5 秒后仍无结果（迟到结果丢弃）",
+      "status": "PASS",
+      "evidence": [
+        "图3-7-取消请求.png",
+        "图3-8-已取消.png"
+      ],
+      "startedAt": 1795572217146,
+      "durationMs": 35279
+    },
+    {
+      "id": "E2E-04",
+      "title": "刷新恢复：生成中刷新页面后恢复同一任务",
+      "preconditions": "正常档案可再次生成",
+      "steps": "打开档案 → 生成 → 处理中刷新页面 → 重新进入档案",
+      "expected": "刷新后仍显示同一任务编号，状态为处理中或已生成，不出现重复任务",
+      "actual": "刷新前任务 AC20261125100415-700c，刷新后恢复为同一任务，状态 处理中",
+      "status": "PASS",
+      "evidence": [
+        "图3-9-刷新恢复.png"
+      ],
+      "startedAt": 1795572252427,
+      "durationMs": 30905
+    },
+    {
+      "id": "E2E-05",
+      "title": "输入不合法：超过 3000 字的档案被拒绝且不产生任务",
+      "preconditions": "存在正文超过 3000 字的需求档案",
+      "steps": "打开超长档案 → 点击生成",
+      "expected": "界面显示长度错误；接口返回 INPUT_INVALID；该档案下没有新任务",
+      "actual": "界面提示“需求文本不能超过 3000 个字符，当前 3520 个字符（INPUT_INVALID）”，任务数保持 0",
+      "status": "PASS",
+      "evidence": [
+        "图3-10-输入超长.png"
+      ],
+      "startedAt": 1795572283333,
+      "durationMs": 3589
+    },
+    {
+      "id": "E2E-06",
+      "title": "信息不足：不生成验收标准，给出待确认问题",
+      "preconditions": "存在只有一句模糊描述的档案",
+      "steps": "打开档案 → 生成 → 等待已生成 → 查看结果",
+      "expected": "requirementKind=insufficient；验收标准 0 条；待确认问题不少于 3 条",
+      "actual": "类型 insufficient，0 条标准，3 个待确认问题",
+      "status": "PASS",
+      "evidence": [
+        "图3-11-信息不足.png"
+      ],
+      "startedAt": 1795572286922,
+      "durationMs": 8121
+    },
+    {
+      "id": "E2E-07",
+      "title": "超出范围：调用模型前拒绝",
+      "preconditions": "存在采购付款类非软件需求档案",
+      "steps": "打开档案 → 生成 → 等待已拒绝",
+      "expected": "状态已拒绝；attempts=0；耗时小于 1 秒；不产生模型调用费用",
+      "actual": "已拒绝，attempts=0，耗时 10 ms，错误码 SCOPE_REJECTED",
+      "status": "PASS",
+      "evidence": [
+        "图3-12-超出范围.png"
+      ],
+      "startedAt": 1795572295043,
+      "durationMs": 4438
+    },
+    {
+      "id": "E2E-08",
+      "title": "两任务交错：不同档案的结果不混用",
+      "preconditions": "档案 A（正常）和档案 B 都可生成",
+      "steps": "打开 A 生成 → 立即打开 B 生成 → 等待两者结束 → 分别查看任务与结果",
+      "expected": "两个任务编号不同；A 的任务只出现在 A 档案，B 的只在 B 档案；各自结果与原文对应",
+      "actual": "A=AC20261125100502-db27、B=AC20261125100505-8617 并行完成，结果摘要不同，任务列表互不混用；回到 A 仍显示 A 的任务",
+      "status": "PASS",
+      "evidence": [
+        "图3-13-两任务交错.png"
+      ],
+      "startedAt": 1795572299482,
+      "durationMs": 86766
+    },
+    {
+      "id": "E2E-09",
+      "title": "人工修改：编辑标题后保存并重新检查",
+      "preconditions": "档案 B 有已生成结果",
+      "steps": "点击编辑 → 修改第一条验收标准的标题 → 保存修改",
+      "expected": "编辑模式可修改字段；保存后 edited=true，标题更新，程序检查重新执行",
+      "actual": "任务 AC20261125100505-8617 人工修改保存成功，edited=true，标题=人工补充：筛选与导出权限校验，检查 grounding=true",
+      "status": "PASS",
+      "evidence": [
+        "图3-14-人工修改.png"
+      ],
+      "startedAt": 1795572386250,
+      "durationMs": 4248
+    },
+    {
+      "id": "E2E-10",
+      "title": "放弃结果：未保存的结果可放弃，任务记录保留",
+      "preconditions": "正常档案有一个未保存的已生成结果",
+      "steps": "打开档案 → 放弃结果 → 确认",
+      "expected": "确认后 decision=DISCARDED；任务记录仍在任务列表；结果不再作为交付内容",
+      "actual": "任务 AC20261125100415-700c decision=DISCARDED，任务记录仍保留在列表",
+      "status": "PASS",
+      "evidence": [
+        "图3-15-放弃结果.png"
+      ],
+      "startedAt": 1795572390500,
+      "durationMs": 5918
+    },
+    {
+      "id": "E2E-11",
+      "title": "转人工：拒绝结果转人工填写并保存",
+      "preconditions": "超出范围档案的任务状态为已拒绝",
+      "steps": "打开档案 → 转人工 → 填写摘要 → 保存修改 → 保存到档案",
+      "expected": "生成 manual 任务；人工填写后可保存；保存后档案可读取人工结果",
+      "actual": "拒绝任务 AC20261125100457-f55b 转人工为 AC20261125100638-619f，人工摘要保存并写入档案",
+      "status": "PASS",
+      "evidence": [
+        "图3-16-转人工保存.png"
+      ],
+      "startedAt": 1795572396419,
+      "durationMs": 5364
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{"runId":"20261124-230444-f95551","ts":"2026-11-24T23:04:44.860306300+08:00","attempt":0,"phase":"context","inputChars":58,"inputPreview":"用户可以在设置页修改昵称和头像，昵称长度 2-20 个字符。保存后立即生效并提示成功；保存失败时保留原值并提示原因。","model":"qwen-plus","taskId":"AC20261124230444-6c7f","mode":"model","version":"revised"}
+{"runId":"20261124-230444-f95551","ts":"2026-11-24T23:04:44.869311200+08:00","attempt":1,"phase":"model","messages":2,"status":"start","promptVersion":"revised"}
+{"runId":"20261124-230444-f95551","ts":"2026-11-24T23:04:44.875308400+08:00","attempt":1,"phase":"model","message":"模型调用失败：未配置 DASHSCOPE_API_KEY，无法调用模型","status":"error","errorType":"MODEL_ERROR","errorCode":"MODEL_UNAVAILABLE"}
+{"runId":"20261124-230444-f95551","ts":"2026-11-24T23:04:44.876307500+08:00","attempt":1,"phase":"finish","status":"FAILED","durationMs":16,"errorCode":"MODEL_UNAVAILABLE"}
